@@ -1,4 +1,12 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { onAuthStateChanged, type User } from 'firebase/auth'
+import {
+  auth,
+  loadCloudArchive,
+  saveCloudArchive,
+  signInWithGoogle,
+  signOutUser,
+} from './firebase'
 
 const VERSION = '26.1.0'
 const STORAGE_KEY = 'songArchive_data'
@@ -648,6 +656,27 @@ const styles = `
     gap: 0.65rem;
   }
 
+  .sa-account {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.85rem;
+    background: rgba(13, 31, 60, 0.5);
+    border: 1px solid var(--sa-border);
+    border-radius: 6px;
+  }
+
+  .sa-account strong {
+    color: var(--sa-text-bright);
+    font-size: 0.9rem;
+  }
+
+  .sa-account span {
+    font-size: 0.75rem;
+    color: var(--sa-text);
+    word-break: break-word;
+  }
+
   .sa-file-input {
     display: none;
   }
@@ -900,6 +929,7 @@ function Shell({
 function App() {
   const [initialState] = useState(getInitialAppState)
   const [data, setData] = useState<ArchiveData>(initialState.data)
+  const dataRef = useRef(initialState.data)
   const [view, setView] = useState<View>(initialState.view)
   const [selectedSongId, setSelectedSongId] = useState<string | null>(null)
 
@@ -920,8 +950,46 @@ function App() {
   const [settingsDayInput, setSettingsDayInput] = useState(initialState.settingsDayInput)
   const [settingsError, setSettingsError] = useState('')
   const [settingsMessage, setSettingsMessage] = useState('')
+  const [user, setUser] = useState<User | null>(null)
+  const [authReady, setAuthReady] = useState(false)
+  const [syncStatus, setSyncStatus] = useState<'local' | 'syncing' | 'synced' | 'error'>('local')
   const [confirmAction, setConfirmAction] = useState<ConfirmAction | null>(null)
   const importInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(
+    () =>
+      onAuthStateChanged(auth, (nextUser) => {
+        setUser(nextUser)
+
+        if (!nextUser) {
+          setSyncStatus('local')
+          setAuthReady(true)
+          return
+        }
+
+        setSyncStatus('syncing')
+        void loadCloudArchive(nextUser)
+          .then((cloudValue) => {
+            if (cloudValue === null) {
+              return saveCloudArchive(nextUser, dataRef.current)
+            }
+
+            const cloudData = parseArchiveData(cloudValue)
+            if (!cloudData) throw new Error('Invalid cloud archive')
+
+            dataRef.current = cloudData
+            setData(cloudData)
+            persistData(cloudData)
+            setInitDayInput(String(cloudData.currentDay))
+            setSettingsDayInput(String(cloudData.currentDay))
+            setView(cloudData.initialized ? 'home' : 'init')
+          })
+          .then(() => setSyncStatus('synced'))
+          .catch(() => setSyncStatus('error'))
+          .finally(() => setAuthReady(true))
+      }),
+    [],
+  )
 
   const selectedSong = useMemo(
     () => data.songs.find((s) => s.id === selectedSongId) ?? null,
@@ -965,8 +1033,16 @@ function App() {
   }, [data.songs, searchTitle, searchArtist, sortOption])
 
   const updateData = (next: ArchiveData) => {
+    dataRef.current = next
     setData(next)
     persistData(next)
+
+    if (user) {
+      setSyncStatus('syncing')
+      void saveCloudArchive(user, next)
+        .then(() => setSyncStatus('synced'))
+        .catch(() => setSyncStatus('error'))
+    }
   }
 
   const parseDay = (value: string): number | null => {
@@ -1118,6 +1194,27 @@ function App() {
     setConfirmAction({ type: 'clearAll' })
   }
 
+  const handleGoogleSignIn = async () => {
+    setSettingsError('')
+    setSettingsMessage('')
+    try {
+      await signInWithGoogle()
+    } catch {
+      setSettingsError('Google 登入失敗，請稍後再試')
+    }
+  }
+
+  const handleSignOut = async () => {
+    setSettingsError('')
+    setSettingsMessage('')
+    try {
+      await signOutUser()
+      setSettingsMessage('已登出，目前使用本機資料')
+    } catch {
+      setSettingsError('登出失敗，請稍後再試')
+    }
+  }
+
   const handleConfirmCancel = () => {
     setConfirmAction(null)
   }
@@ -1159,9 +1256,17 @@ function App() {
         setView(validated.initialized ? 'home' : 'init')
         break
       }
-      case 'clearAll':
+      case 'clearAll': {
+        const next = defaultData()
         clearStorage()
-        setData(defaultData())
+        dataRef.current = next
+        setData(next)
+        if (user) {
+          setSyncStatus('syncing')
+          void saveCloudArchive(user, next)
+            .then(() => setSyncStatus('synced'))
+            .catch(() => setSyncStatus('error'))
+        }
         setInitDayInput('1')
         setSettingsDayInput('1')
         resetSongForm()
@@ -1175,6 +1280,7 @@ function App() {
         setInitMessage('所有資料已清除')
         setView('init')
         break
+      }
     }
 
     setConfirmAction(null)
@@ -1544,6 +1650,16 @@ function App() {
   }
 
   if (activeView === 'settings') {
+    const syncLabel = !authReady
+      ? '正在確認登入狀態'
+      : syncStatus === 'syncing'
+        ? '正在同步'
+        : syncStatus === 'synced'
+          ? '雲端資料已同步'
+          : syncStatus === 'error'
+            ? '同步失敗'
+            : '資料僅保存在此裝置'
+
     return renderShell(
       `系統設定 · ${VERSION}`,
       <main className="sa-main">
@@ -1551,6 +1667,29 @@ function App() {
             <p className="sa-badge">系統設定</p>
             <h1 className="sa-title">設定</h1>
           </header>
+          <div className="sa-divider" aria-hidden="true" />
+          <div className="sa-settings-group">
+            <p className="sa-section-title">Google 帳號與同步</p>
+            <div className="sa-account">
+              <strong>{user ? user.displayName || 'Google 使用者' : '尚未登入'}</strong>
+              <span>{user?.email ?? syncLabel}</span>
+              {user && <span>{syncLabel}</span>}
+            </div>
+            {user ? (
+              <button type="button" className="sa-btn sa-btn-ghost" onClick={handleSignOut}>
+                登出 Google 帳號
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="sa-btn"
+                onClick={handleGoogleSignIn}
+                disabled={!authReady}
+              >
+                使用 Google 登入
+              </button>
+            )}
+          </div>
           <div className="sa-divider" aria-hidden="true" />
           <div className="sa-settings-group">
             <p className="sa-section-title">資料統計</p>
