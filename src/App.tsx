@@ -8,7 +8,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.1.2'
+const VERSION = '26.1.3'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -1525,47 +1525,61 @@ function App() {
     return renderShell(
       `系統初始化 · ${VERSION}`,
       <main className="sa-main">
-          <header className="sa-header">
-            <p className="sa-badge">系統初始化</p>
-            <h1 className="sa-title">Song Archive</h1>
-            <p className="sa-version">{VERSION}</p>
-            <p className="sa-subtitle">歡迎使用個人歌曲分享管理器，請先設定您的起始天數。</p>
-          </header>
-          <div className="sa-divider" aria-hidden="true" />
-          <form
-            className="sa-form"
-            onSubmit={(e) => {
-              e.preventDefault()
-              handleInit()
-            }}
+        <header className="sa-header">
+          <p className="sa-badge">系統初始化</p>
+          <h1 className="sa-title">Song Archive</h1>
+          <p className="sa-version">{VERSION}</p>
+          <p className="sa-subtitle">歡迎使用個人歌曲分享管理器，請先設定您的起始天數或登入同步資料。</p>
+        </header>
+        <div className="sa-divider" aria-hidden="true" />
+        <form
+          className="sa-form"
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleInit()
+          }}
+        >
+          <div className="sa-field">
+            <label className="sa-label" htmlFor="init-day">
+              目前天數
+            </label>
+            <input
+              id="init-day"
+              className="sa-input"
+              type="number"
+              min={1}
+              step={1}
+              inputMode="numeric"
+              placeholder="例如：171"
+              value={initDayInput}
+              onChange={(e) => {
+                setInitDayInput(e.target.value)
+                setInitError('')
+                setInitMessage('')
+              }}
+            />
+          </div>
+          {initError && <p className="sa-error">{initError}</p>}
+          {initMessage && <p className="sa-success">{initMessage}</p>}
+          <button type="submit" className="sa-btn">
+            開始使用
+          </button>
+        </form>
+
+        <div className="sa-divider" aria-hidden="true" style={{ margin: '2rem 0' }} />
+
+        <div style={{ textAlign: 'center' }}>
+          <p className="sa-subtitle" style={{ marginBottom: '1rem' }}>已有雲端備份？</p>
+          <button
+            type="button"
+            className="sa-btn sa-btn-ghost"
+            onClick={handleGoogleSignIn}
+            disabled={syncStatus === 'syncing'}
           >
-            <div className="sa-field">
-              <label className="sa-label" htmlFor="init-day">
-                目前天數
-              </label>
-              <input
-                id="init-day"
-                className="sa-input"
-                type="number"
-                min={1}
-                step={1}
-                inputMode="numeric"
-                placeholder="例如：171"
-                value={initDayInput}
-                onChange={(e) => {
-                  setInitDayInput(e.target.value)
-                  setInitError('')
-                  setInitMessage('')
-                }}
-              />
-            </div>
-            {initError && <p className="sa-error">{initError}</p>}
-            {initMessage && <p className="sa-success">{initMessage}</p>}
-            <button type="submit" className="sa-btn">
-              開始使用
-            </button>
-          </form>
-        </main>,
+            {syncStatus === 'syncing' ? '同步中...' : '透過 Google 登入同步'}
+          </button>
+        </div>
+      </main>,
     )
   }
 
