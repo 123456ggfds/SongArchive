@@ -8,7 +8,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.1.3'
+const VERSION = '26.1.4'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -1222,7 +1222,13 @@ function App() {
     if (songLink.trim()) song.link = songLink.trim()
     if (songNote.trim()) song.note = songNote.trim()
 
-    updateData({ ...data, songs: [song, ...data.songs] })
+    const nextDay = data.currentDay + 1
+    updateData({
+      ...data,
+      currentDay: nextDay,
+      songs: [song, ...data.songs],
+    })
+    setSettingsDayInput(String(nextDay))
     resetSongForm()
     setView('home')
   }
