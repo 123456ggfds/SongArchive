@@ -13,15 +13,17 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="src/main.tsx"></script>
     <script>
-      /* 暫時停用 SW 以排除 iOS 快取問題
+      // 強制註銷所有 Service Worker 以解決 iOS 黑畫面快取問題
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js');
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+            console.log('Service Worker Unregistered');
+          }
         });
       }
-      */
     </script>
   </body>
 </html>
