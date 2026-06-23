@@ -2,32 +2,17 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="SongArchive" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <title>Song Archive</title>
   </head>
   <body>
     <div id="root"></div>
-    <script>
-      // 強力清除所有快取與 Service Worker，解決 iOS Chrome 頑固快取問題
-      (async () => {
-        try {
-          if ('serviceWorker' in navigator) {
-            const registrations = await navigator.serviceWorker.getRegistrations();
-            for (const reg of registrations) {
-              await reg.unregister();
-            }
-          }
-          if ('caches' in window) {
-            const keys = await caches.keys();
-            for (const key of keys) {
-              await caches.delete(key);
-            }
-          }
-        } catch (e) {
-          console.error('Cleanup failed', e);
-        }
-      })();
-    </script>
     <script type="module" src="./src/main.tsx"></script>
   </body>
 </html>
