@@ -2,18 +2,18 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=2624" />
-    <link rel="manifest" href="./manifest.json?v=2624" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="manifest" href="manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="SongArchive" />
-    <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2624" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <title>Song Archive</title>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="src/main.tsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
     <script>
       // 強制註銷所有 Service Worker 以解決 iOS 黑畫面快取問題
       if ('serviceWorker' in navigator) {
