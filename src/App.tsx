@@ -30,6 +30,7 @@ type ArchiveData = {
 }
 
 type View = 'init' | 'home' | 'add' | 'history' | 'detail' | 'edit' | 'settings'
+type Theme = 'light' | 'dark' | 'system'
 
 type SortOption = 'date-desc' | 'date-asc' | 'day-desc' | 'day-asc'
 
@@ -177,12 +178,25 @@ function persistData(data: ArchiveData) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
 }
 
+const THEME_STORAGE_KEY = 'songArchive_theme'
+
+function loadTheme(): Theme {
+  const saved = localStorage.getItem(THEME_STORAGE_KEY)
+  if (saved === 'light' || saved === 'dark' || saved === 'system') return saved
+  return 'system'
+}
+
+function saveTheme(theme: Theme) {
+  localStorage.setItem(THEME_STORAGE_KEY, theme)
+}
+
 function clearStorage() {
   localStorage.removeItem(STORAGE_KEY)
 }
 
 const styles = `
   .sa-root {
+    /* Default Dark Theme Variables */
     --sa-bg-deep: #050a14;
     --sa-bg-mid: #0a1628;
     --sa-bg-card: #0d1f3c;
@@ -195,6 +209,11 @@ const styles = `
     --sa-danger: #f87171;
     --sa-danger-dim: rgba(248, 113, 113, 0.15);
     --sa-touch: 2.75rem;
+    --sa-gradient-top: rgba(30, 74, 138, 0.55);
+    --sa-gradient-bottom: rgba(14, 116, 144, 0.2);
+    --sa-scanline-opacity: 0.03;
+    --sa-grid-opacity: 0.35;
+    --sa-modal-bg: rgba(5, 10, 20, 0.8);
 
     min-height: 100dvh;
     min-height: 100svh;
@@ -208,8 +227,8 @@ const styles = `
     padding-left: max(1rem, env(safe-area-inset-left));
     padding-right: max(1rem, env(safe-area-inset-right));
     background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(30, 74, 138, 0.55), transparent),
-      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(14, 116, 144, 0.2), transparent),
+      radial-gradient(ellipse 80% 50% at 50% -10%, var(--sa-gradient-top), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 100%, var(--sa-gradient-bottom), transparent),
       linear-gradient(180deg, var(--sa-bg-deep) 0%, var(--sa-bg-mid) 50%, var(--sa-bg-deep) 100%);
     color: var(--sa-text);
     font-family: system-ui, 'Segoe UI', 'Microsoft JhengHei', sans-serif;
@@ -234,7 +253,7 @@ const styles = `
     background-size: 2rem 2rem;
     mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 75%);
     pointer-events: none;
-    opacity: 0.35;
+    opacity: var(--sa-grid-opacity);
   }
 
   .sa-scanline {
@@ -244,8 +263,8 @@ const styles = `
       0deg,
       transparent,
       transparent 2px,
-      rgba(0, 0, 0, 0.03) 2px,
-      rgba(0, 0, 0, 0.03) 4px
+      rgba(0, 0, 0, var(--sa-scanline-opacity)) 2px,
+      rgba(0, 0, 0, var(--sa-scanline-opacity)) 4px
     );
     pointer-events: none;
   }
@@ -740,7 +759,7 @@ const styles = `
     padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
     padding-left: max(1.25rem, env(safe-area-inset-left));
     padding-right: max(1.25rem, env(safe-area-inset-right));
-    background: rgba(5, 10, 20, 0.8);
+    background: var(--sa-modal-bg);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
@@ -814,6 +833,56 @@ const styles = `
       gap: 0.65rem;
     }
   }
+
+  /* Light Theme Overrides */
+  .sa-root.light {
+    --sa-bg-deep: #f8fafc;
+    --sa-bg-mid: #f1f5f9;
+    --sa-bg-card: #ffffff;
+    --sa-cyan: #0284c7;
+    --sa-cyan-dim: rgba(2, 132, 199, 0.1);
+    --sa-cyan-glow: rgba(2, 132, 199, 0.3);
+    --sa-text: #475569;
+    --sa-text-bright: #0f172a;
+    --sa-border: rgba(2, 132, 199, 0.15);
+    --sa-danger: #dc2626;
+    --sa-danger-dim: rgba(220, 38, 38, 0.1);
+    --sa-gradient-top: rgba(186, 230, 253, 0.4);
+    --sa-gradient-bottom: rgba(165, 243, 252, 0.2);
+    --sa-scanline-opacity: 0.015;
+    --sa-grid-opacity: 0.2;
+    --sa-modal-bg: rgba(248, 250, 252, 0.85);
+  }
+
+  .sa-root.light .sa-stat-card,
+  .sa-root.light .sa-meta-row,
+  .sa-root.light .sa-recent-item,
+  .sa-root.light .sa-history-item,
+  .sa-root.light .sa-account,
+  .sa-root.light .sa-detail-card {
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .sa-root.light .sa-input,
+  .sa-root.light .sa-select,
+  .sa-root.light .sa-textarea {
+    background: #ffffff;
+  }
+
+  .sa-root.light .sa-btn {
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .sa-root.light .sa-btn-danger {
+    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+  }
+
+  .sa-root.light .sa-btn-ghost {
+    background: transparent;
+    box-shadow: none;
+  }
 `
 
 type ConfirmAction =
@@ -822,6 +891,7 @@ type ConfirmAction =
   | { type: 'resetInit' }
   | { type: 'importData'; data: ArchiveData }
   | { type: 'clearAll' }
+  | { type: 'signOut' }
 
 function getConfirmContent(action: ConfirmAction) {
   switch (action.type) {
@@ -859,6 +929,13 @@ function getConfirmContent(action: ConfirmAction) {
         message: '此操作無法復原，所有歌曲紀錄、設定與資料將永久刪除。',
         confirmText: '確定清除',
         danger: true,
+      }
+    case 'signOut':
+      return {
+        title: '確定要登出嗎？',
+        message: '登出後將停止同步雲端資料，但本機資料仍會保留。',
+        confirmText: '確定登出',
+        danger: false,
       }
   }
 }
@@ -907,15 +984,30 @@ function Shell({
   children,
   footer,
   overlay,
+  theme,
 }: {
   children: React.ReactNode
   footer?: string
   overlay?: React.ReactNode
+  theme: Theme
 }) {
+  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(() => 
+    window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  )
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const handler = (e: MediaQueryListEvent) => setSystemTheme(e.matches ? 'dark' : 'light')
+    media.addEventListener('change', handler)
+    return () => media.removeEventListener('change', handler)
+  }, [])
+
+  const resolvedTheme = theme === 'system' ? systemTheme : theme
+
   return (
     <>
       <style>{styles}</style>
-      <div className="sa-root">
+      <div className={`sa-root ${resolvedTheme}`}>
         <div className="sa-grid" aria-hidden="true" />
         <div className="sa-scanline" aria-hidden="true" />
         {children}
@@ -928,6 +1020,7 @@ function Shell({
 
 function App() {
   const [initialState] = useState(getInitialAppState)
+  const [theme, setTheme] = useState<Theme>(loadTheme)
   const [data, setData] = useState<ArchiveData>(initialState.data)
   const dataRef = useRef(initialState.data)
   const [view, setView] = useState<View>(initialState.view)
@@ -1204,6 +1297,10 @@ function App() {
     }
   }
 
+  const handleSignOutRequest = () => {
+    setConfirmAction({ type: 'signOut' })
+  }
+
   const handleSignOut = async () => {
     setSettingsError('')
     setSettingsMessage('')
@@ -1281,6 +1378,9 @@ function App() {
         setView('init')
         break
       }
+      case 'signOut':
+        handleSignOut()
+        break
     }
 
     setConfirmAction(null)
@@ -1330,7 +1430,7 @@ function App() {
   ) : null
 
   const renderShell = (footer: string, children: React.ReactNode) => (
-    <Shell footer={footer} overlay={confirmOverlay}>
+    <Shell footer={footer} overlay={confirmOverlay} theme={theme}>
       {children}
     </Shell>
   )
@@ -1660,6 +1760,11 @@ function App() {
             ? '同步失敗'
             : '資料僅保存在此裝置'
 
+    const handleThemeChange = (newTheme: Theme) => {
+      setTheme(newTheme)
+      saveTheme(newTheme)
+    }
+
     return renderShell(
       `系統設定 · ${VERSION}`,
       <main className="sa-main">
@@ -1669,6 +1774,33 @@ function App() {
           </header>
           <div className="sa-divider" aria-hidden="true" />
           <div className="sa-settings-group">
+            <p className="sa-section-title">外觀主題</p>
+            <div className="sa-actions-row">
+              <button
+                type="button"
+                className={`sa-btn sa-btn-sm${theme === 'light' ? '' : ' sa-btn-ghost'}`}
+                onClick={() => handleThemeChange('light')}
+              >
+                淺色模式
+              </button>
+              <button
+                type="button"
+                className={`sa-btn sa-btn-sm${theme === 'dark' ? '' : ' sa-btn-ghost'}`}
+                onClick={() => handleThemeChange('dark')}
+              >
+                深色模式
+              </button>
+            </div>
+            <button
+              type="button"
+              className={`sa-btn sa-btn-sm${theme === 'system' ? '' : ' sa-btn-ghost'}`}
+              onClick={() => handleThemeChange('system')}
+            >
+              跟隨系統
+            </button>
+          </div>
+          <div className="sa-divider" aria-hidden="true" />
+          <div className="sa-settings-group">
             <p className="sa-section-title">Google 帳號與同步</p>
             <div className="sa-account">
               <strong>{user ? user.displayName || 'Google 使用者' : '尚未登入'}</strong>
@@ -1676,7 +1808,7 @@ function App() {
               {user && <span>{syncLabel}</span>}
             </div>
             {user ? (
-              <button type="button" className="sa-btn sa-btn-ghost" onClick={handleSignOut}>
+              <button type="button" className="sa-btn sa-btn-ghost" onClick={handleSignOutRequest}>
                 登出 Google 帳號
               </button>
             ) : (
