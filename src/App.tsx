@@ -8,7 +8,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.1.0'
+const VERSION = '26.1.1'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
