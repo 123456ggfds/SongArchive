@@ -1,10 +1,10 @@
 const CACHE_NAME = 'songarchive-v1';
 const ASSETS = [
-  '/SongArchive/',
-  '/SongArchive/index.html',
-  '/SongArchive/manifest.json',
-  '/SongArchive/icon-192.png',
-  '/SongArchive/icon-512.png'
+  './',
+  'index.html',
+  'manifest.json',
+  'icon-192.png',
+  'icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
