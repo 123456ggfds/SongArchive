@@ -1,7 +1,7 @@
 {
   "name": "songarchive",
   "private": true,
-  "version": "26.11.5",
+  "version": "26.11.5b",
   "type": "module",
   "scripts": {
     "dev": "vite",
