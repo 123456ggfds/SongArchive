@@ -8,7 +8,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.11.7b'
+const VERSION = '26.11.8b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -1698,82 +1698,83 @@ function App() {
   if (activeView === 'history') {
     return renderShell(
       `歷史紀錄 · ${VERSION}`,
-      <main className="sa-main">
-          <header className="sa-header">
-            <p className="sa-badge">資料庫</p>
-            <h1 className="sa-title">歷史紀錄</h1>
-            <p className="sa-subtitle">共 {data.songs.length} 首歌曲</p>
-          </header>
+      <main className="sa-main" style={{ height: '90dvh', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <button type="button" className="sa-btn sa-btn-sm sa-btn-ghost" style={{ width: 'auto', margin: 0 }} onClick={() => setView('home')}>
+              ← 返回
+            </button>
+            <header className="sa-header" style={{ flex: 1, textAlign: 'right' }}>
+              <h1 className="sa-title" style={{ fontSize: '1.25rem' }}>歷史紀錄</h1>
+              <p className="sa-subtitle" style={{ fontSize: '0.75rem' }}>共 {data.songs.length} 首</p>
+            </header>
+          </div>
+          
           <div className="sa-divider" aria-hidden="true" />
-          <div className="sa-filters">
+          
+          <div className="sa-filters" style={{ flexShrink: 0 }}>
             <div className="sa-field">
-              <label className="sa-label" htmlFor="search-title">
-                搜尋歌名
-              </label>
               <input
-                id="search-title"
                 className="sa-input"
                 type="search"
-                placeholder="輸入歌名關鍵字"
+                placeholder="搜尋歌名..."
                 value={searchTitle}
                 onChange={(e) => setSearchTitle(e.target.value)}
               />
             </div>
             <div className="sa-field">
-              <label className="sa-label" htmlFor="search-artist">
-                搜尋歌手
-              </label>
               <input
-                id="search-artist"
                 className="sa-input"
                 type="search"
-                placeholder="輸入歌手關鍵字"
+                placeholder="搜尋歌手..."
                 value={searchArtist}
                 onChange={(e) => setSearchArtist(e.target.value)}
               />
             </div>
+            <div className="sa-field">
+              <select
+                className="sa-select"
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value as SortOption)}
+                style={{ minHeight: '2.5rem', padding: '0.5rem' }}
+              >
+                <option value="date-desc">日期（新→舊）</option>
+                <option value="date-asc">日期（舊→新）</option>
+                <option value="day-desc">天數（高→低）</option>
+                <option value="day-asc">天數（低→高）</option>
+              </select>
+            </div>
           </div>
-          <div className="sa-field">
-            <label className="sa-label" htmlFor="sort-option">
-              排序方式
-            </label>
-            <select
-              id="sort-option"
-              className="sa-select"
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value as SortOption)}
-            >
-              <option value="date-desc">依日期（新到舊）</option>
-              <option value="date-asc">依日期（舊到新）</option>
-              <option value="day-desc">依天數（高到低）</option>
-              <option value="day-asc">依天數（低到高）</option>
-            </select>
+
+          <div className="sa-divider" aria-hidden="true" />
+
+          <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingRight: '4px' }}>
+            {filteredSongs.length === 0 ? (
+              <p className="sa-empty">
+                {data.songs.length === 0 ? '尚無紀錄。' : '找不到歌曲。'}
+              </p>
+            ) : (
+              <ul className="sa-history-list" style={{ display: 'block', padding: 0 }}>
+                {filteredSongs.map((song) => (
+                  <li key={song.id} className="sa-history-item" style={{ marginBottom: '1rem', display: 'block' }}>
+                    <button
+                      type="button"
+                      className="sa-history-btn"
+                      onClick={() => openSongDetail(song.id)}
+                      style={{ padding: '1.25rem 1rem', display: 'block' }}
+                    >
+                      <strong style={{ fontSize: '1.1rem', marginBottom: '0.4rem', display: 'block' }}>{song.title}</strong>
+                      <span style={{ fontSize: '0.85rem', opacity: 0.8, display: 'block' }}>
+                        第 {song.day} 天 · {song.artist}
+                      </span>
+                      <span style={{ fontSize: '0.75rem', opacity: 0.6, display: 'block', marginTop: '0.2rem' }}>
+                        {formatDisplayDate(song.createdAt)}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-          {filteredSongs.length === 0 ? (
-            <p className="sa-empty">
-              {data.songs.length === 0 ? '尚無收錄紀錄，請先新增歌曲。' : '找不到符合條件的歌曲。'}
-            </p>
-          ) : (
-            <ul className="sa-history-list">
-              {filteredSongs.map((song) => (
-                <li key={song.id} className="sa-history-item">
-                  <button
-                    type="button"
-                    className="sa-history-btn"
-                    onClick={() => openSongDetail(song.id)}
-                  >
-                    <strong>{song.title}</strong>
-                    <span>
-                      第 {song.day} 天 · {song.artist} · {formatDisplayDate(song.createdAt)}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          <button type="button" className="sa-btn sa-btn-ghost" onClick={() => setView('home')}>
-            返回首頁
-          </button>
         </main>,
     )
   }
