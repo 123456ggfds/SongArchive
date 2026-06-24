@@ -8,7 +8,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.11.5b'
+const VERSION = '26.11.6b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -618,56 +618,61 @@ const styles = `
   .sa-history-list {
     list-style: none;
     margin: 0;
-    padding: 0.25rem;
+    padding: 0.5rem 0.25rem;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    max-height: 26rem;
+    gap: 1rem;
+    max-height: 32rem;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
   .sa-history-item {
     padding: 0;
-    background: rgba(13, 31, 60, 0.55);
+    background: rgba(13, 31, 60, 0.6);
     border: 1px solid var(--sa-border);
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   .sa-history-item:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
+    background: rgba(13, 31, 60, 0.8);
   }
 
   .sa-history-btn {
     width: 100%;
-    padding: 0.9rem 1rem;
+    padding: 1.25rem 1.15rem;
     background: transparent;
     border: none;
     cursor: pointer;
     text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.65rem;
     color: inherit;
     font-family: inherit;
-    min-height: var(--sa-touch);
+    min-height: 4.5rem;
   }
 
   .sa-history-btn strong {
     color: var(--sa-text-bright);
-    font-size: 1rem;
-    line-height: 1.4;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.3;
     word-break: break-word;
+    letter-spacing: 0.01em;
   }
 
   .sa-history-btn span {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-family: ui-monospace, Consolas, monospace;
     color: var(--sa-text);
-    opacity: 0.8;
+    line-height: 1.5;
+    display: block;
+    opacity: 0.9;
   }
 
   .sa-empty {
