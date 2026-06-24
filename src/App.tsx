@@ -8,7 +8,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.11.4'
+const VERSION = '26.11.5'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -618,11 +618,11 @@ const styles = `
   .sa-history-list {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 0.25rem;
     display: flex;
     flex-direction: column;
-    gap: 0.55rem;
-    max-height: 22rem;
+    gap: 0.75rem;
+    max-height: 26rem;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -631,20 +631,26 @@ const styles = `
     padding: 0;
     background: rgba(13, 31, 60, 0.55);
     border: 1px solid var(--sa-border);
-    border-radius: 6px;
+    border-radius: 8px;
     overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .sa-history-item:active {
+    transform: scale(0.98);
   }
 
   .sa-history-btn {
     width: 100%;
-    padding: 0.75rem 0.85rem;
+    padding: 0.9rem 1rem;
     background: transparent;
     border: none;
     cursor: pointer;
     text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.35rem;
     color: inherit;
     font-family: inherit;
     min-height: var(--sa-touch);
@@ -652,13 +658,16 @@ const styles = `
 
   .sa-history-btn strong {
     color: var(--sa-text-bright);
-    font-size: 0.9rem;
+    font-size: 1rem;
+    line-height: 1.4;
+    word-break: break-word;
   }
 
   .sa-history-btn span {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-family: ui-monospace, Consolas, monospace;
     color: var(--sa-text);
+    opacity: 0.8;
   }
 
   .sa-empty {
