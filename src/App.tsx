@@ -8,7 +8,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.11.8b'
+const VERSION = '26.12.0b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -214,6 +214,7 @@ const styles = `
     --sa-scanline-opacity: 0.03;
     --sa-grid-opacity: 0.35;
     --sa-modal-bg: rgba(5, 10, 20, 0.8);
+    --sa-tab-height: 4.5rem;
 
     min-height: 100dvh;
     min-height: 100svh;
@@ -221,9 +222,9 @@ const styles = `
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 1.25rem 1rem 2rem;
+    padding: 1.25rem 1rem calc(var(--sa-tab-height) + 1rem);
     padding-top: max(1.25rem, env(safe-area-inset-top));
-    padding-bottom: max(2rem, env(safe-area-inset-bottom));
+    padding-bottom: max(calc(var(--sa-tab-height) + 1rem), env(safe-area-inset-bottom));
     padding-left: max(1rem, env(safe-area-inset-left));
     padding-right: max(1rem, env(safe-area-inset-right));
     background:
@@ -236,6 +237,60 @@ const styles = `
     overflow-x: hidden;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  .sa-tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--sa-tab-height);
+    background: rgba(10, 22, 40, 0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--sa-border);
+    display: flex;
+    align-items: stretch;
+    justify-content: space-around;
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 1000;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .sa-tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    background: transparent;
+    border: none;
+    color: var(--sa-text);
+    cursor: pointer;
+    transition: color 0.2s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .sa-tab-item.active {
+    color: var(--sa-cyan);
+    text-shadow: 0 0 8px var(--sa-cyan-dim);
+  }
+
+  .sa-tab-item:active {
+    transform: scale(0.92);
+  }
+
+  .sa-tab-icon {
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .sa-tab-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
 
   .sa-root *,
@@ -991,14 +1046,18 @@ function ConfirmModal({
 
 function Shell({
   children,
-  footer,
   overlay,
+  activeView,
+  onViewChange,
   theme,
+  data,
 }: {
   children: React.ReactNode
-  footer?: string
   overlay?: React.ReactNode
+  activeView: View
+  onViewChange: (view: View) => void
   theme: Theme
+  data: ArchiveData
 }) {
   const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(() => 
     window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
@@ -1012,6 +1071,7 @@ function Shell({
   }, [])
 
   const resolvedTheme = theme === 'system' ? systemTheme : theme
+  const showTabBar = activeView !== 'init' && activeView !== 'detail' && activeView !== 'edit'
 
   return (
     <>
@@ -1020,8 +1080,45 @@ function Shell({
         <div className="sa-grid" aria-hidden="true" />
         <div className="sa-scanline" aria-hidden="true" />
         {children}
+        
+        {showTabBar && (
+          <nav className="sa-tab-bar" aria-label="底部導航">
+            <button
+              type="button"
+              className={`sa-tab-item${activeView === 'home' ? ' active' : ''}`}
+              onClick={() => onViewChange('home')}
+            >
+              <span className="sa-tab-icon">⌂</span>
+              <span className="sa-tab-label">首頁</span>
+            </button>
+            <button
+              type="button"
+              className={`sa-tab-item${activeView === 'add' ? ' active' : ''}`}
+              onClick={() => onViewChange('add')}
+            >
+              <span className="sa-tab-icon">＋</span>
+              <span className="sa-tab-label">新增</span>
+            </button>
+            <button
+              type="button"
+              className={`sa-tab-item${activeView === 'history' ? ' active' : ''}`}
+              onClick={() => onViewChange('history')}
+            >
+              <span className="sa-tab-icon">▤</span>
+              <span className="sa-tab-label">紀錄</span>
+            </button>
+            <button
+              type="button"
+              className={`sa-tab-item${activeView === 'settings' ? ' active' : ''}`}
+              onClick={() => onViewChange('settings')}
+            >
+              <span className="sa-tab-icon">⚙</span>
+              <span className="sa-tab-label">設定</span>
+            </button>
+          </nav>
+        )}
+        
         {overlay}
-        {footer && <footer className="sa-footer">{footer}</footer>}
       </div>
     </>
   )
@@ -1444,8 +1541,21 @@ function App() {
     />
   ) : null
 
-  const renderShell = (footer: string, children: React.ReactNode) => (
-    <Shell footer={footer} overlay={confirmOverlay} theme={theme}>
+  const renderShell = (title: string, children: React.ReactNode) => (
+    <Shell 
+      activeView={activeView} 
+      onViewChange={(v) => {
+        if (v === 'settings') {
+          setSettingsDayInput(String(data.currentDay))
+          setSettingsError('')
+          setSettingsMessage('')
+        }
+        setView(v)
+      }} 
+      overlay={confirmOverlay} 
+      theme={theme}
+      data={data}
+    >
       {children}
     </Shell>
   )
@@ -1972,7 +2082,7 @@ function App() {
             <div className="sa-divider" aria-hidden="true" />
             <div>
               <p className="sa-section-title">最近新增</p>
-              <ul className="sa-recent-list">
+              <ul className="sa-recent-list" style={{ marginTop: '0.65rem' }}>
                 {recentSongs.map((song) => (
                   <li key={song.id} className="sa-recent-item">
                     <strong>{song.title}</strong>
@@ -1986,26 +2096,10 @@ function App() {
           </>
         )}
         <div className="sa-divider" aria-hidden="true" />
-        <nav className="sa-actions" aria-label="主要功能">
-          <button type="button" className="sa-btn" onClick={openAddSong}>
-            新增歌曲
-          </button>
-          <button type="button" className="sa-btn" onClick={() => setView('history')}>
-            歷史紀錄
-          </button>
-          <button
-            type="button"
-            className="sa-btn"
-            onClick={() => {
-              setSettingsDayInput(String(data.currentDay))
-              setSettingsError('')
-              setSettingsMessage('')
-              setView('settings')
-            }}
-          >
-            設定
-          </button>
-        </nav>
+        <div className="sa-stat-card" style={{ textAlign: 'center', background: 'rgba(56, 189, 248, 0.05)' }}>
+          <p>歡迎回來</p>
+          <span style={{ fontSize: '0.9rem' }}>使用底部選單切換功能</span>
+        </div>
       </main>,
   )
 }
