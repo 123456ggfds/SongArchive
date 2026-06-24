@@ -8,7 +8,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.11.6b'
+const VERSION = '26.11.7b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -618,61 +618,56 @@ const styles = `
   .sa-history-list {
     list-style: none;
     margin: 0;
-    padding: 0.5rem 0.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-height: 32rem;
+    padding: 0.5rem 0;
+    display: block; /* 改用 Block 佈局確保穩定性 */
+    max-height: 35rem;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
   .sa-history-item {
-    padding: 0;
-    background: rgba(13, 31, 60, 0.6);
+    display: block;
+    margin-bottom: 1.25rem; /* 強制底部間距 */
+    background: rgba(13, 31, 60, 0.65);
     border: 1px solid var(--sa-border);
     border-radius: 12px;
     overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  .sa-history-item:active {
-    transform: scale(0.97);
-    background: rgba(13, 31, 60, 0.8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
   .sa-history-btn {
     width: 100%;
-    padding: 1.25rem 1.15rem;
+    padding: 1.5rem 1.25rem;
     background: transparent;
     border: none;
     cursor: pointer;
     text-align: left;
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
+    display: block; /* 改用 Block 佈局 */
     color: inherit;
     font-family: inherit;
-    min-height: 4.5rem;
+    min-height: 5.5rem;
+    -webkit-tap-highlight-color: rgba(56, 189, 248, 0.1);
   }
 
   .sa-history-btn strong {
+    display: block;
     color: var(--sa-text-bright);
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    line-height: 1.3;
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
     word-break: break-word;
-    letter-spacing: 0.01em;
   }
 
   .sa-history-btn span {
-    font-size: 0.85rem;
+    display: block;
+    font-size: 0.9rem;
     font-family: ui-monospace, Consolas, monospace;
     color: var(--sa-text);
-    line-height: 1.5;
-    display: block;
-    opacity: 0.9;
+    line-height: 1.6;
+    opacity: 0.85;
   }
 
   .sa-empty {
