@@ -8,7 +8,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.12.2b'
+const VERSION = '26.12.3b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -1259,11 +1259,7 @@ function App() {
     setFormError('')
   }
 
-  const openAddSong = () => {
-    resetSongForm()
-    setSelectedSongId(null)
-    setView('add')
-  }
+
 
   const openEditSong = (song: Song) => {
     setSelectedSongId(song.id)
