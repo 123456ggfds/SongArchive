@@ -8,7 +8,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.12.1b'
+const VERSION = '26.12.2b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -222,9 +222,9 @@ const styles = `
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 1.25rem 1rem calc(var(--sa-tab-height) + 1rem);
+    padding: 1.25rem 1rem calc(var(--sa-tab-height) + 1.5rem);
     padding-top: max(1.25rem, env(safe-area-inset-top));
-    padding-bottom: max(calc(var(--sa-tab-height) + 1rem), env(safe-area-inset-bottom));
+    padding-bottom: max(calc(var(--sa-tab-height) + 1.5rem), env(safe-area-inset-bottom));
     padding-left: max(1rem, env(safe-area-inset-left));
     padding-right: max(1rem, env(safe-area-inset-right));
     background:
@@ -333,7 +333,8 @@ const styles = `
     flex-direction: column;
     align-items: stretch;
     gap: 1.25rem;
-    margin: auto 0;
+    margin: 0 auto;
+    padding-top: 1rem;
   }
 
   .sa-header {
