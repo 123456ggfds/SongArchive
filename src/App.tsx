@@ -8,7 +8,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.12.0b'
+const VERSION = '26.12.1b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -1050,14 +1050,12 @@ function Shell({
   activeView,
   onViewChange,
   theme,
-  data,
 }: {
   children: React.ReactNode
   overlay?: React.ReactNode
   activeView: View
   onViewChange: (view: View) => void
   theme: Theme
-  data: ArchiveData
 }) {
   const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(() => 
     window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
@@ -1541,7 +1539,7 @@ function App() {
     />
   ) : null
 
-  const renderShell = (title: string, children: React.ReactNode) => (
+  const renderShell = (_title: string, children: React.ReactNode) => (
     <Shell 
       activeView={activeView} 
       onViewChange={(v) => {
@@ -1554,7 +1552,6 @@ function App() {
       }} 
       overlay={confirmOverlay} 
       theme={theme}
-      data={data}
     >
       {children}
     </Shell>
