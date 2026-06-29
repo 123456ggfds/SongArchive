@@ -8,7 +8,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.12.4b'
+const VERSION = '26.12.5b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -2075,7 +2075,8 @@ function App() {
             <div className="sa-divider" aria-hidden="true" />
             <div>
               <p className="sa-section-title">最近新增</p>
-              <ul className="sa-recent-list" style={{ marginTop: '0.65rem' }}>
+              {recentSongs.length > 0 ? (
+                <ul className="sa-recent-list" style={{ marginTop: '0.65rem' }}>
                 {recentSongs.map((song) => (
                   <li key={song.id} className="sa-recent-item">
                     <strong>{song.title}</strong>
@@ -2084,8 +2085,10 @@ function App() {
                     </span>
                   </li>
                 ))}
-              </ul>
-              {recentSongs.length === 0 && <p className="sa-empty">尚無新增歌曲</p>}
+                </ul>
+              ) : (
+                <p className="sa-empty">尚無新增歌曲</p>
+              )}
             </div>
         </>
       </main>,
