@@ -2071,8 +2071,7 @@ function App() {
             <span>{data.songs.length} 首</span>
           </div>
         </div>
-        {recentSongs.length > 0 && (
-          <>
+        <>
             <div className="sa-divider" aria-hidden="true" />
             <div>
               <p className="sa-section-title">最近新增</p>
@@ -2086,14 +2085,9 @@ function App() {
                   </li>
                 ))}
               </ul>
+              {recentSongs.length === 0 && <p className="sa-empty">尚無新增歌曲</p>}
             </div>
-          </>
-        )}
-        <div className="sa-divider" aria-hidden="true" />
-        <div className="sa-stat-card" style={{ textAlign: 'center', background: 'rgba(56, 189, 248, 0.05)' }}>
-          <p>歡迎回來</p>
-          <span style={{ fontSize: '0.9rem' }}>使用底部選單切換功能</span>
-        </div>
+        </>
       </main>,
   )
 }
