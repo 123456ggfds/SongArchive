@@ -8,7 +8,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.12.5b'
+const VERSION = '26.12.4b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -1535,6 +1535,8 @@ function App() {
       onConfirm={handleConfirmAction}
     />
   ) : null
+
+  const activeView = view
 
   const renderShell = (_title: string, children: React.ReactNode) => (
     <Shell 
