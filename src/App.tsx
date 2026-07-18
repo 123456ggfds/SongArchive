@@ -1945,17 +1945,27 @@ function App() {
             </div>
             {user ? (
               <button type="button" className="sa-btn sa-btn-ghost" onClick={handleSignOutRequest}>
-                登出 Google 帳號
+                登出帳號
               </button>
             ) : (
-              <button
-                type="button"
-                className="sa-btn"
-                onClick={handleGoogleSignIn}
-                disabled={!authReady}
-              >
-                使用 Google 登入
-              </button>
+              <div className="sa-actions">
+                <button
+                  type="button"
+                  className="sa-btn"
+                  onClick={handleGoogleSignIn}
+                  disabled={!authReady}
+                >
+                  使用 Google 登入
+                </button>
+                <button
+                  type="button"
+                  className="sa-btn sa-btn-ghost"
+                  onClick={handleGithubSignIn}
+                  disabled={!authReady}
+                >
+                  使用 GitHub 登入
+                </button>
+              </div>
             )}
           </div>
           <div className="sa-divider" aria-hidden="true" />
