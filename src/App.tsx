@@ -10,7 +10,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.13.2b'
+const VERSION = '26.13.3b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -330,11 +330,11 @@ const styles = `
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 28rem;
+    max-width: 30rem;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 1.25rem;
+    gap: 1rem;
     margin: 0 auto;
     padding-top: 1rem;
   }
@@ -381,6 +381,18 @@ const styles = `
     font-size: 0.85rem;
     color: var(--sa-text);
     line-height: 1.5;
+  }
+
+  .sa-page-copy {
+    max-width: 24rem;
+    text-align: center;
+  }
+
+  .sa-init-sync {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    text-align: center;
   }
 
   .sa-card-grid {
@@ -492,6 +504,10 @@ const styles = `
     display: flex;
     flex-direction: column;
     gap: 0.65rem;
+  }
+
+  .sa-auth-actions {
+    gap: 0.55rem;
   }
 
   .sa-actions-row {
@@ -739,14 +755,15 @@ const styles = `
   .sa-settings-group {
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0.75rem;
+    padding: 0.1rem 0;
   }
 
   .sa-account {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
-    padding: 0.85rem;
+    gap: 0.45rem;
+    padding: 0.9rem;
     background: rgba(13, 31, 60, 0.5);
     border: 1px solid var(--sa-border);
     border-radius: 6px;
@@ -761,6 +778,10 @@ const styles = `
     font-size: 0.75rem;
     color: var(--sa-text);
     word-break: break-word;
+  }
+
+  .sa-account span:last-child {
+    color: var(--sa-cyan);
   }
 
   .sa-file-input {
@@ -880,6 +901,11 @@ const styles = `
       gap: 1.5rem;
     }
 
+    .sa-auth-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
     .sa-title {
       font-size: 1.85rem;
     }
@@ -887,7 +913,7 @@ const styles = `
 
   @media (min-width: 768px) {
     .sa-main {
-      max-width: 32rem;
+      max-width: 36rem;
     }
 
     .sa-card-grid {
@@ -1693,7 +1719,7 @@ function App() {
           <p className="sa-badge">系統初始化</p>
           <h1 className="sa-title">Song Archive</h1>
           <p className="sa-version">{VERSION}</p>
-          <p className="sa-subtitle">
+          <p className="sa-subtitle sa-page-copy">
             歡迎使用個人歌曲分享管理器，您可以先設定起始天數，或使用 Google / GitHub 登入同步雲端資料。
           </p>
         </header>
@@ -1732,11 +1758,12 @@ function App() {
           </button>
         </form>
 
-        <div className="sa-divider" aria-hidden="true" style={{ margin: '2rem 0' }} />
+        <div className="sa-divider" aria-hidden="true" />
 
-        <div style={{ textAlign: 'center' }}>
-          <p className="sa-subtitle" style={{ marginBottom: '1rem' }}>已有雲端備份？</p>
-          <div className="sa-actions">
+        <div className="sa-init-sync">
+          <p className="sa-section-title">已有雲端備份？</p>
+          <p className="sa-subtitle">登入後會自動讀取同一個帳號的雲端資料。</p>
+          <div className="sa-actions sa-auth-actions">
             <button
               type="button"
               className="sa-btn"
@@ -2012,7 +2039,7 @@ function App() {
               {user && <span>{syncLabel}</span>}
             </div>
             {user ? (
-              <div className="sa-actions">
+              <div className="sa-actions sa-auth-actions">
                 {!isGithubLinked && (
                   <button
                     type="button"
@@ -2028,7 +2055,7 @@ function App() {
                 </button>
               </div>
             ) : (
-              <div className="sa-actions">
+              <div className="sa-actions sa-auth-actions">
                 <button
                   type="button"
                   className="sa-btn"
