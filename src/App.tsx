@@ -1410,11 +1410,16 @@ function App() {
     setSettingsMessage('')
     try {
       await signInWithGithub()
-    } catch (err: any) {
-      if (err.code === 'auth/account-exists-with-different-credential') {
-        setSettingsError('此電子郵件已關聯其他登入方式，請使用 Google 登入')
+    } catch (error: unknown) {
+      const code =
+        typeof error === 'object' && error !== null && 'code' in error
+          ? String(error.code)
+          : ''
+
+      if (code === 'auth/account-exists-with-different-credential') {
+        setSettingsError('此電子郵件已關聯其他登入方式，請改用原本的登入方式')
       } else {
-        setSettingsError('GitHub 登入失敗，請確認 Firebase 設定')
+        setSettingsError('GitHub 登入失敗，請稍後再試')
       }
     }
   }
@@ -1704,14 +1709,24 @@ function App() {
 
         <div style={{ textAlign: 'center' }}>
           <p className="sa-subtitle" style={{ marginBottom: '1rem' }}>已有雲端備份？</p>
-          <button
-            type="button"
-            className="sa-btn sa-btn-ghost"
-            onClick={handleGoogleSignIn}
-            disabled={syncStatus === 'syncing'}
-          >
-            {syncStatus === 'syncing' ? '同步中...' : '透過 Google 登入同步'}
-          </button>
+          <div className="sa-actions">
+            <button
+              type="button"
+              className="sa-btn"
+              onClick={handleGoogleSignIn}
+              disabled={!authReady || syncStatus === 'syncing'}
+            >
+              {syncStatus === 'syncing' ? '同步中...' : '透過 Google 登入同步'}
+            </button>
+            <button
+              type="button"
+              className="sa-btn sa-btn-ghost"
+              onClick={handleGithubSignIn}
+              disabled={!authReady || syncStatus === 'syncing'}
+            >
+              {syncStatus === 'syncing' ? '同步中...' : '透過 GitHub 登入同步'}
+            </button>
+          </div>
         </div>
       </main>,
     )
@@ -1950,9 +1965,9 @@ function App() {
           </div>
           <div className="sa-divider" aria-hidden="true" />
           <div className="sa-settings-group">
-            <p className="sa-section-title">Google 帳號與同步</p>
+            <p className="sa-section-title">帳號與同步</p>
             <div className="sa-account">
-              <strong>{user ? user.displayName || 'Google 使用者' : '尚未登入'}</strong>
+              <strong>{user ? user.displayName || '已登入使用者' : '尚未登入'}</strong>
               <span>{user?.email ?? syncLabel}</span>
               {user && <span>{syncLabel}</span>}
             </div>
@@ -1966,7 +1981,7 @@ function App() {
                   type="button"
                   className="sa-btn"
                   onClick={handleGoogleSignIn}
-                  disabled={!authReady}
+                  disabled={!authReady || syncStatus === 'syncing'}
                 >
                   使用 Google 登入
                 </button>
@@ -1974,7 +1989,7 @@ function App() {
                   type="button"
                   className="sa-btn sa-btn-ghost"
                   onClick={handleGithubSignIn}
-                  disabled={!authReady}
+                  disabled={!authReady || syncStatus === 'syncing'}
                 >
                   使用 GitHub 登入
                 </button>
