@@ -3,6 +3,7 @@ import {
   GithubAuthProvider,
   GoogleAuthProvider,
   getAuth,
+  linkWithPopup,
   signInWithPopup,
   signOut,
   type User,
@@ -31,6 +32,10 @@ export function signInWithGoogle() {
 
 export function signInWithGithub() {
   return signInWithPopup(auth, githubProvider)
+}
+
+export function linkGithubAccount(user: User) {
+  return linkWithPopup(user, githubProvider)
 }
 
 export function signOutUser() {

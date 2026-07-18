@@ -44,8 +44,8 @@ npm run build
 
 歌曲與設定保存在目前瀏覽器的 `localStorage`，儲存鍵為 `songArchive_data`。清除瀏覽器網站資料可能會刪除紀錄，建議定期使用設定頁面的匯出功能備份 JSON 檔案。
 
-登入 Google 或 GitHub 帳號後，資料會同步至該帳號專屬的 Cloud Firestore 文件。初始化頁與設定頁都可以登入同步；未登入時仍可只使用本機資料。
+登入 Google 或 GitHub 帳號後，資料會同步至該帳號專屬的 Cloud Firestore 文件。初始化頁與設定頁都可以登入同步；未登入時仍可只使用本機資料。同一個電子郵件若已先用 Google 登入，請先用 Google 登入後到設定頁連結 GitHub，之後就能直接用 GitHub 登入同一份資料。
 
 ## 版本
 
-目前版本：`26.13.1b`
+目前版本：`26.13.2b`

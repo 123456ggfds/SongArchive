@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { onAuthStateChanged, type User } from 'firebase/auth'
 import {
   auth,
+  linkGithubAccount,
   loadCloudArchive,
   saveCloudArchive,
   signInWithGoogle,
@@ -9,7 +10,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.13.1b'
+const VERSION = '26.13.2b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -1417,9 +1418,33 @@ function App() {
           : ''
 
       if (code === 'auth/account-exists-with-different-credential') {
-        setSettingsError('此電子郵件已關聯其他登入方式，請改用原本的登入方式')
+        setSettingsError('此電子郵件已用其他方式登入過，請先用原本方式登入，再到設定連結 GitHub')
       } else {
         setSettingsError('GitHub 登入失敗，請稍後再試')
+      }
+    }
+  }
+
+  const handleGithubLink = async () => {
+    if (!user) return
+    setSettingsError('')
+    setSettingsMessage('')
+    try {
+      const result = await linkGithubAccount(user)
+      setUser(result.user)
+      setSettingsMessage('GitHub 帳號已連結，之後可以直接使用 GitHub 登入')
+    } catch (error: unknown) {
+      const code =
+        typeof error === 'object' && error !== null && 'code' in error
+          ? String(error.code)
+          : ''
+
+      if (code === 'auth/provider-already-linked') {
+        setSettingsMessage('GitHub 帳號已經連結')
+      } else if (code === 'auth/credential-already-in-use') {
+        setSettingsError('這個 GitHub 帳號已連結到其他帳號')
+      } else {
+        setSettingsError('GitHub 帳號連結失敗，請稍後再試')
       }
     }
   }
@@ -1916,6 +1941,18 @@ function App() {
   }
 
   if (activeView === 'settings') {
+    const linkedProviderIds = user?.providerData.map((provider) => provider.providerId) ?? []
+    const isGithubLinked = linkedProviderIds.includes('github.com')
+    const linkedProviderLabel =
+      linkedProviderIds
+        .map((providerId) =>
+          providerId === 'google.com'
+            ? 'Google'
+            : providerId === 'github.com'
+              ? 'GitHub'
+              : providerId,
+        )
+        .join('、') || '尚未連結登入方式'
     const syncLabel = !authReady
       ? '正在確認登入狀態'
       : syncStatus === 'syncing'
@@ -1971,12 +2008,25 @@ function App() {
             <div className="sa-account">
               <strong>{user ? user.displayName || '已登入使用者' : '尚未登入'}</strong>
               <span>{user?.email ?? syncLabel}</span>
+              {user && <span>已連結：{linkedProviderLabel}</span>}
               {user && <span>{syncLabel}</span>}
             </div>
             {user ? (
-              <button type="button" className="sa-btn sa-btn-ghost" onClick={handleSignOutRequest}>
-                登出帳號
-              </button>
+              <div className="sa-actions">
+                {!isGithubLinked && (
+                  <button
+                    type="button"
+                    className="sa-btn"
+                    onClick={handleGithubLink}
+                    disabled={!authReady || syncStatus === 'syncing'}
+                  >
+                    連結 GitHub 帳號
+                  </button>
+                )}
+                <button type="button" className="sa-btn sa-btn-ghost" onClick={handleSignOutRequest}>
+                  登出帳號
+                </button>
+              </div>
             ) : (
               <div className="sa-actions">
                 <button
