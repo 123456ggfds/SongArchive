@@ -9,7 +9,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.13.0b'
+const VERSION = '26.13.0c'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -1668,7 +1668,9 @@ function App() {
           <p className="sa-badge">系統初始化</p>
           <h1 className="sa-title">Song Archive</h1>
           <p className="sa-version">{VERSION}</p>
-          <p className="sa-subtitle">歡迎使用個人歌曲分享管理器，請先設定您的起始天數或登入同步資料。</p>
+          <p className="sa-subtitle">
+            歡迎使用個人歌曲分享管理器，您可以先設定起始天數，或使用 Google / GitHub 登入同步雲端資料。
+          </p>
         </header>
         <div className="sa-divider" aria-hidden="true" />
         <form
