@@ -5,10 +5,11 @@ import {
   loadCloudArchive,
   saveCloudArchive,
   signInWithGoogle,
+  signInWithGithub,
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.12.4b'
+const VERSION = '26.13.0b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -1404,6 +1405,20 @@ function App() {
     }
   }
 
+  const handleGithubSignIn = async () => {
+    setSettingsError('')
+    setSettingsMessage('')
+    try {
+      await signInWithGithub()
+    } catch (err: any) {
+      if (err.code === 'auth/account-exists-with-different-credential') {
+        setSettingsError('此電子郵件已關聯其他登入方式，請使用 Google 登入')
+      } else {
+        setSettingsError('GitHub 登入失敗，請確認 Firebase 設定')
+      }
+    }
+  }
+
   const handleSignOutRequest = () => {
     setConfirmAction({ type: 'signOut' })
   }
@@ -1535,8 +1550,6 @@ function App() {
       onConfirm={handleConfirmAction}
     />
   ) : null
-
-  const activeView = view
 
   const renderShell = (_title: string, children: React.ReactNode) => (
     <Shell 
