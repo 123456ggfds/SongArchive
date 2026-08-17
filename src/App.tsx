@@ -10,7 +10,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.13.3b'
+const VERSION = '26.14.0b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -197,102 +197,58 @@ function clearStorage() {
 }
 
 const styles = `
-  .sa-root {
-    /* Default Dark Theme Variables */
-    --sa-bg-deep: #050a14;
-    --sa-bg-mid: #0a1628;
-    --sa-bg-card: #0d1f3c;
-    --sa-cyan: #38bdf8;
-    --sa-cyan-dim: rgba(56, 189, 248, 0.15);
-    --sa-cyan-glow: rgba(56, 189, 248, 0.45);
-    --sa-text: #94a3b8;
-    --sa-text-bright: #e2e8f0;
-    --sa-border: rgba(56, 189, 248, 0.25);
-    --sa-danger: #f87171;
-    --sa-danger-dim: rgba(248, 113, 113, 0.15);
-    --sa-touch: 2.75rem;
-    --sa-gradient-top: rgba(30, 74, 138, 0.55);
-    --sa-gradient-bottom: rgba(14, 116, 144, 0.2);
-    --sa-scanline-opacity: 0.03;
-    --sa-grid-opacity: 0.35;
-    --sa-modal-bg: rgba(5, 10, 20, 0.8);
-    --sa-tab-height: 4.5rem;
+  html,
+  body,
+  #root {
+    width: 100%;
+    min-width: 0;
+    min-height: 100%;
+    margin: 0;
+  }
 
+  body {
+    background: #07101f;
+  }
+
+  .sa-root {
+    --sa-bg-start: #07101f;
+    --sa-bg-end: #15122e;
+    --sa-surface: rgba(20, 29, 56, 0.46);
+    --sa-surface-strong: rgba(28, 38, 72, 0.68);
+    --sa-surface-input: rgba(7, 14, 33, 0.34);
+    --sa-surface-hover: rgba(101, 125, 211, 0.22);
+    --sa-text: rgba(230, 236, 255, 0.74);
+    --sa-text-bright: #ffffff;
+    --sa-text-muted: rgba(220, 228, 255, 0.5);
+    --sa-border: rgba(255, 255, 255, 0.13);
+    --sa-border-bright: rgba(255, 255, 255, 0.28);
+    --sa-accent: #a9c7ff;
+    --sa-accent-strong: #d5e2ff;
+    --sa-accent-soft: rgba(151, 190, 255, 0.24);
+    --sa-accent-glow: rgba(118, 157, 255, 0.34);
+    --sa-danger: #ff9b9c;
+    --sa-danger-soft: rgba(255, 123, 128, 0.18);
+    --sa-shadow: 0 18px 42px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    --sa-shadow-raised: 0 16px 36px rgba(4, 8, 28, 0.26), 0 0 0 1px rgba(255, 255, 255, 0.025), inset 0 1px 0 rgba(255, 255, 255, 0.13);
+    --sa-touch: 2.875rem;
+    --sa-tab-height: 4.55rem;
+    --sa-bottom-space: calc(var(--sa-tab-height) + env(safe-area-inset-bottom) + 1.8rem);
+
+    position: relative;
+    isolation: isolate;
     min-height: 100dvh;
     min-height: 100svh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 1.25rem 1rem calc(var(--sa-tab-height) + 1.5rem);
-    padding-top: max(1.25rem, env(safe-area-inset-top));
-    padding-bottom: max(calc(var(--sa-tab-height) + 1.5rem), env(safe-area-inset-bottom));
-    padding-left: max(1rem, env(safe-area-inset-left));
-    padding-right: max(1rem, env(safe-area-inset-right));
+    padding: max(1.05rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) var(--sa-bottom-space) max(1rem, env(safe-area-inset-left));
+    overflow-x: clip;
+    color: var(--sa-text);
     background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, var(--sa-gradient-top), transparent),
-      radial-gradient(ellipse 60% 40% at 100% 100%, var(--sa-gradient-bottom), transparent),
-      linear-gradient(180deg, var(--sa-bg-deep) 0%, var(--sa-bg-mid) 50%, var(--sa-bg-deep) 100%);
-    color: var(--sa-text);
-    font-family: system-ui, 'Segoe UI', 'Microsoft JhengHei', sans-serif;
-    position: relative;
-    overflow-x: hidden;
-    box-sizing: border-box;
+      radial-gradient(58rem 35rem at -10% -14%, rgba(69, 164, 255, 0.33), transparent 58%),
+      radial-gradient(44rem 33rem at 108% 16%, rgba(201, 108, 255, 0.3), transparent 60%),
+      radial-gradient(36rem 28rem at 52% 112%, rgba(52, 226, 205, 0.16), transparent 63%),
+      linear-gradient(145deg, var(--sa-bg-start) 0%, var(--sa-bg-end) 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Microsoft JhengHei", sans-serif;
+    letter-spacing: -0.01em;
     -webkit-tap-highlight-color: transparent;
-  }
-
-  .sa-tab-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: var(--sa-tab-height);
-    background: rgba(10, 22, 40, 0.9);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid var(--sa-border);
-    display: flex;
-    align-items: stretch;
-    justify-content: space-around;
-    padding-bottom: env(safe-area-inset-bottom);
-    z-index: 1000;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-  }
-
-  .sa-tab-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.25rem;
-    background: transparent;
-    border: none;
-    color: var(--sa-text);
-    cursor: pointer;
-    transition: color 0.2s, transform 0.1s;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .sa-tab-item.active {
-    color: var(--sa-cyan);
-    text-shadow: 0 0 8px var(--sa-cyan-dim);
-  }
-
-  .sa-tab-item:active {
-    transform: scale(0.92);
-  }
-
-  .sa-tab-icon {
-    font-size: 1.4rem;
-    font-weight: 700;
-    line-height: 1;
-  }
-
-  .sa-tab-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
   }
 
   .sa-root *,
@@ -301,487 +257,507 @@ const styles = `
     box-sizing: border-box;
   }
 
-  .sa-grid {
+  .sa-root::before,
+  .sa-root::after {
     position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(var(--sa-border) 1px, transparent 1px),
-      linear-gradient(90deg, var(--sa-border) 1px, transparent 1px);
-    background-size: 2rem 2rem;
-    mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 75%);
+    z-index: -2;
+    width: 15rem;
+    height: 15rem;
+    border-radius: 999px;
+    filter: blur(26px);
+    opacity: 0.42;
+    content: '';
     pointer-events: none;
-    opacity: var(--sa-grid-opacity);
+    animation: sa-drift 15s ease-in-out infinite alternate;
   }
 
+  .sa-root::before {
+    top: 18%;
+    left: -7rem;
+    background: rgba(64, 181, 255, 0.44);
+  }
+
+  .sa-root::after {
+    right: -7rem;
+    bottom: 16%;
+    background: rgba(210, 105, 255, 0.34);
+    animation-delay: -6s;
+  }
+
+  .sa-root.light {
+    --sa-bg-start: #dceaff;
+    --sa-bg-end: #f8f8ff;
+    --sa-surface: rgba(255, 255, 255, 0.52);
+    --sa-surface-strong: rgba(255, 255, 255, 0.74);
+    --sa-surface-input: rgba(255, 255, 255, 0.55);
+    --sa-surface-hover: rgba(130, 177, 255, 0.19);
+    --sa-text: rgba(30, 44, 78, 0.78);
+    --sa-text-bright: #12213f;
+    --sa-text-muted: rgba(39, 56, 94, 0.54);
+    --sa-border: rgba(255, 255, 255, 0.62);
+    --sa-border-bright: rgba(255, 255, 255, 0.94);
+    --sa-accent: #2864bd;
+    --sa-accent-strong: #154c9b;
+    --sa-accent-soft: rgba(73, 134, 230, 0.16);
+    --sa-accent-glow: rgba(65, 135, 235, 0.25);
+    --sa-danger: #c63e55;
+    --sa-danger-soft: rgba(221, 76, 97, 0.12);
+    --sa-shadow: 0 18px 42px rgba(44, 76, 138, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.86);
+    --sa-shadow-raised: 0 16px 34px rgba(49, 85, 145, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .sa-liquid-orb {
+    position: fixed;
+    z-index: -1;
+    width: 14rem;
+    height: 14rem;
+    border-radius: 44% 56% 63% 37% / 48% 40% 60% 52%;
+    filter: blur(34px) saturate(130%);
+    pointer-events: none;
+    opacity: 0.42;
+    mix-blend-mode: screen;
+    animation: sa-orb-float 17s ease-in-out infinite;
+  }
+
+  .sa-orb-one {
+    top: 6%;
+    right: 2%;
+    background: rgba(90, 150, 255, 0.42);
+  }
+
+  .sa-orb-two {
+    bottom: 10%;
+    left: 4%;
+    width: 12rem;
+    height: 12rem;
+    background: rgba(148, 91, 255, 0.32);
+    animation-delay: -5.5s;
+  }
+
+  .sa-orb-three {
+    top: 43%;
+    left: 48%;
+    width: 10rem;
+    height: 10rem;
+    background: rgba(57, 232, 191, 0.22);
+    animation-delay: -10.5s;
+  }
+
+  .sa-root.light .sa-liquid-orb {
+    opacity: 0.34;
+    mix-blend-mode: multiply;
+  }
+
+  .sa-grid,
   .sa-scanline {
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, var(--sa-scanline-opacity)) 2px,
-      rgba(0, 0, 0, var(--sa-scanline-opacity)) 4px
-    );
-    pointer-events: none;
+    display: none;
   }
 
-  .sa-main {
+  .sa-page-stage {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 30rem;
+    display: flex;
+    justify-content: center;
+    animation: sa-page-enter 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .sa-main {
+    width: min(100%, 39rem);
     display: flex;
     flex-direction: column;
-    align-items: stretch;
     gap: 1rem;
     margin: 0 auto;
-    padding-top: 1rem;
+    padding: 0.35rem 0 0;
   }
 
   .sa-header {
-    text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.35rem;
+    padding: 0.65rem 0 0.3rem;
+    text-align: center;
+  }
+
+  .sa-badge,
+  .sa-section-title,
+  .sa-label,
+  .sa-version {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--sa-accent);
   }
 
   .sa-badge {
-    font-family: ui-monospace, Consolas, monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    color: var(--sa-cyan);
+    padding: 0.34rem 0.7rem;
     border: 1px solid var(--sa-border);
-    padding: 0.35rem 0.75rem;
-    border-radius: 4px;
-    background: var(--sa-cyan-dim);
-    box-shadow: 0 0 12px var(--sa-cyan-dim);
+    border-radius: 999px;
+    background: linear-gradient(115deg, var(--sa-accent-soft), rgba(255, 255, 255, 0.035));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 6px 18px rgba(45, 80, 179, 0.08);
   }
 
   .sa-title {
+    max-width: 100%;
     margin: 0;
-    font-size: 1.65rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
     color: var(--sa-text-bright);
-    text-shadow: 0 0 24px var(--sa-cyan-glow);
-    line-height: 1.25;
+    font-size: clamp(1.72rem, 7vw, 2.35rem);
+    font-weight: 750;
+    line-height: 1.18;
+    letter-spacing: -0.045em;
+    overflow-wrap: anywhere;
+    text-shadow: 0 1px 18px rgba(255, 255, 255, 0.1);
   }
 
   .sa-version {
     margin: 0;
-    font-family: ui-monospace, Consolas, monospace;
-    font-size: 0.85rem;
-    color: var(--sa-cyan);
+    color: var(--sa-text-muted);
+    letter-spacing: 0.04em;
   }
 
-  .sa-subtitle {
+  .sa-subtitle,
+  .sa-page-copy {
     margin: 0;
-    font-size: 0.85rem;
-    color: var(--sa-text);
-    line-height: 1.5;
+    color: var(--sa-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
   }
 
   .sa-page-copy {
-    max-width: 24rem;
-    text-align: center;
-  }
-
-  .sa-init-sync {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-    text-align: center;
-  }
-
-  .sa-card-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.6rem;
-    width: 100%;
-  }
-
-  .sa-stat-card {
-    padding: 0.85rem;
-    background: rgba(13, 31, 60, 0.65);
-    border: 1px solid var(--sa-border);
-    border-radius: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    box-shadow: 0 0 16px rgba(56, 189, 248, 0.06);
-  }
-
-  .sa-stat-card p {
-    margin: 0;
-    font-size: 0.75rem;
-    color: var(--sa-text);
-  }
-
-  .sa-stat-card span {
-    font-family: ui-monospace, Consolas, monospace;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--sa-cyan);
-  }
-
-  .sa-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    width: 100%;
-  }
-
-  .sa-meta-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.65rem 0.85rem;
-    background: rgba(13, 31, 60, 0.5);
-    border: 1px solid var(--sa-border);
-    border-radius: 6px;
-  }
-
-  .sa-meta-row p {
-    margin: 0;
-    font-size: 0.85rem;
-  }
-
-  .sa-meta-row span {
-    color: var(--sa-cyan);
-    font-weight: 600;
-    font-family: ui-monospace, Consolas, monospace;
-    font-size: 0.85rem;
+    max-width: 31rem;
   }
 
   .sa-divider {
     width: 100%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--sa-cyan-glow), transparent);
+    margin: 0.12rem 0;
+    background: linear-gradient(90deg, transparent, var(--sa-border-bright), transparent);
+    opacity: 0.65;
+  }
+
+  .sa-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+
+  .sa-stat-card,
+  .sa-meta-row,
+  .sa-recent-item,
+  .sa-history-item,
+  .sa-account,
+  .sa-detail-card,
+  .sa-form,
+  .sa-settings-group {
+    border: 1px solid var(--sa-border);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.025)), var(--sa-surface);
+    box-shadow: var(--sa-shadow);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+  }
+
+  .sa-stat-card {
+    min-height: 6.25rem;
+    padding: 1rem;
+    border-radius: 1.35rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.45rem;
+    overflow: hidden;
+  }
+
+  .sa-stat-card::after {
+    width: 4.5rem;
+    height: 4.5rem;
+    position: absolute;
+    content: '';
+    align-self: flex-end;
+    border-radius: 999px;
+    background: radial-gradient(circle, var(--sa-accent-soft), transparent 68%);
+    filter: blur(3px);
+  }
+
+  .sa-stat-card p,
+  .sa-meta-row p {
+    z-index: 1;
+    margin: 0;
+    color: var(--sa-text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .sa-stat-card span,
+  .sa-meta-row span {
+    z-index: 1;
+    color: var(--sa-text-bright);
+    font-size: 1.14rem;
+    font-weight: 720;
+    letter-spacing: -0.03em;
+  }
+
+  .sa-meta,
+  .sa-actions,
+  .sa-recent-list,
+  .sa-init-sync {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.72rem;
+  }
+
+  .sa-meta-row {
+    min-height: 3.4rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .sa-meta-row span {
+    font-size: 0.87rem;
+    text-align: right;
   }
 
   .sa-section-title {
     margin: 0;
-    font-size: 0.8rem;
-    font-family: ui-monospace, Consolas, monospace;
-    letter-spacing: 0.08em;
-    color: var(--sa-cyan);
   }
 
-  .sa-recent-list {
+  .sa-recent-list,
+  .sa-history-list {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
   }
 
   .sa-recent-item {
-    padding: 0.75rem 0.85rem;
-    background: rgba(13, 31, 60, 0.55);
-    border: 1px solid var(--sa-border);
-    border-radius: 6px;
+    padding: 0.9rem 1rem;
+    border-radius: 1.1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    gap: 0.2rem;
+  }
+
+  .sa-recent-item strong,
+  .sa-history-btn strong,
+  .sa-account strong,
+  .sa-detail-row dd {
+    color: var(--sa-text-bright);
+    overflow-wrap: anywhere;
   }
 
   .sa-recent-item strong {
-    color: var(--sa-text-bright);
-    font-size: 0.9rem;
+    font-size: 0.98rem;
   }
 
   .sa-recent-item span {
-    font-size: 0.75rem;
-    color: var(--sa-text);
+    color: var(--sa-text-muted);
+    font-size: 0.8rem;
   }
 
-  .sa-actions {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-  }
-
+  .sa-actions-row,
   .sa-auth-actions {
-    gap: 0.55rem;
-  }
-
-  .sa-actions-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.65rem;
   }
 
   .sa-btn {
     width: 100%;
     min-height: var(--sa-touch);
-    padding: 0.85rem 1.15rem;
-    font-size: 0.95rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    color: var(--sa-text-bright);
-    background: linear-gradient(135deg, var(--sa-bg-card) 0%, rgba(13, 31, 60, 0.8) 100%);
+    padding: 0.78rem 1rem;
     border: 1px solid var(--sa-border);
-    border-radius: 6px;
+    border-radius: 1rem;
+    color: var(--sa-text-bright);
+    background: linear-gradient(128deg, rgba(255, 255, 255, 0.19), rgba(255, 255, 255, 0.045)), var(--sa-surface-strong);
+    box-shadow: var(--sa-shadow-raised);
     cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 680;
+    letter-spacing: -0.01em;
     text-align: center;
+    transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
     -webkit-appearance: none;
     appearance: none;
-  }
-
-  .sa-btn::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--sa-cyan);
-    opacity: 0.6;
-    transition: opacity 0.2s, box-shadow 0.2s;
+    -webkit-backdrop-filter: blur(18px) saturate(175%);
+    backdrop-filter: blur(18px) saturate(175%);
   }
 
   .sa-btn:hover:not(:disabled) {
-    border-color: var(--sa-cyan-glow);
-    box-shadow: 0 0 20px var(--sa-cyan-dim), inset 0 0 20px rgba(56, 189, 248, 0.05);
+    border-color: var(--sa-border-bright);
+    background: linear-gradient(128deg, rgba(255, 255, 255, 0.27), rgba(255, 255, 255, 0.075)), var(--sa-surface-hover);
+    box-shadow: 0 18px 34px rgba(15, 24, 62, 0.22), 0 0 0 4px var(--sa-accent-soft), inset 0 1px 0 rgba(255, 255, 255, 0.21);
   }
 
-  .sa-btn:hover:not(:disabled)::before {
-    opacity: 1;
-    box-shadow: 0 0 8px var(--sa-cyan);
-  }
-
-  .sa-btn:active:not(:disabled) {
-    transform: scale(0.98);
+  .sa-btn:active:not(:disabled),
+  .sa-tab-item:active {
+    transform: scale(0.97);
   }
 
   .sa-btn:disabled {
-    opacity: 0.45;
     cursor: not-allowed;
+    opacity: 0.48;
   }
 
-  .sa-btn:focus-visible {
-    outline: 2px solid var(--sa-cyan);
-    outline-offset: 2px;
-  }
-
-  .sa-btn-danger {
-    color: #fecaca;
-    border-color: rgba(248, 113, 113, 0.35);
-    background: linear-gradient(135deg, rgba(60, 13, 13, 0.6) 0%, rgba(30, 10, 10, 0.8) 100%);
-  }
-
-  .sa-btn-danger::before {
-    background: var(--sa-danger);
-  }
-
-  .sa-btn-danger:hover:not(:disabled) {
-    border-color: rgba(248, 113, 113, 0.6);
-    box-shadow: 0 0 20px var(--sa-danger-dim);
+  .sa-btn:focus-visible,
+  .sa-tab-item:focus-visible,
+  .sa-input:focus-visible,
+  .sa-select:focus-visible,
+  .sa-textarea:focus-visible,
+  .sa-history-btn:focus-visible {
+    outline: 2px solid var(--sa-accent);
+    outline-offset: 3px;
   }
 
   .sa-btn-ghost {
-    background: transparent;
-    font-size: 0.85rem;
-    min-height: 2.5rem;
-    padding: 0.6rem 1rem;
+    color: var(--sa-text);
+    background: rgba(255, 255, 255, 0.035);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
   }
 
-  .sa-btn-ghost::before {
-    display: none;
+  .sa-btn-danger {
+    color: var(--sa-danger);
+    border-color: rgba(255, 150, 157, 0.26);
+    background: linear-gradient(135deg, rgba(255, 147, 156, 0.18), rgba(255, 255, 255, 0.03)), var(--sa-danger-soft);
+  }
+
+  .sa-btn-danger:hover:not(:disabled) {
+    border-color: rgba(255, 171, 176, 0.58);
+    box-shadow: 0 16px 32px rgba(100, 20, 39, 0.18), 0 0 0 4px rgba(255, 134, 143, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
   .sa-btn-sm {
-    min-height: 2.5rem;
-    padding: 0.6rem 0.85rem;
-    font-size: 0.85rem;
+    min-height: 2.55rem;
+    padding: 0.57rem 0.75rem;
+    font-size: 0.82rem;
   }
 
-  .sa-footer {
-    position: relative;
-    z-index: 1;
-    margin-top: 1.5rem;
-    font-family: ui-monospace, Consolas, monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    color: rgba(148, 163, 184, 0.4);
-    text-align: center;
-  }
-
-  .sa-form {
+  .sa-form,
+  .sa-settings-group {
+    padding: 1rem;
+    border-radius: 1.35rem;
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
-    width: 100%;
+    gap: 0.84rem;
   }
 
   .sa-field {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.4rem;
   }
 
   .sa-label {
-    font-size: 0.8rem;
-    font-family: ui-monospace, Consolas, monospace;
-    color: var(--sa-cyan);
-    letter-spacing: 0.04em;
+    padding-left: 0.15rem;
+    color: var(--sa-text-muted);
+    letter-spacing: 0.025em;
   }
 
   .sa-input,
   .sa-select,
   .sa-textarea {
     width: 100%;
-    padding: 0.75rem 0.9rem;
-    font-size: 1rem;
-    color: var(--sa-text-bright);
-    background: rgba(5, 10, 20, 0.6);
-    border: 1px solid var(--sa-border);
-    border-radius: 6px;
+    min-height: var(--sa-touch);
+    padding: 0.72rem 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.9rem;
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    font-family: inherit;
+    color: var(--sa-text-bright);
+    background: var(--sa-surface-input);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.14), 0 1px 0 rgba(255, 255, 255, 0.08);
+    font: inherit;
+    font-size: 0.95rem;
+    transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
     -webkit-appearance: none;
     appearance: none;
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    backdrop-filter: blur(14px) saturate(160%);
+  }
+
+  .sa-select {
+    cursor: pointer;
+    color-scheme: dark;
+  }
+
+  .sa-root.light .sa-select {
+    color-scheme: light;
   }
 
   .sa-textarea {
-    min-height: 5rem;
+    min-height: 6rem;
     resize: vertical;
-    line-height: 1.5;
+    line-height: 1.55;
+  }
+
+  .sa-input::placeholder,
+  .sa-textarea::placeholder {
+    color: var(--sa-text-muted);
+    opacity: 0.76;
   }
 
   .sa-input:focus,
   .sa-select:focus,
   .sa-textarea:focus {
-    border-color: var(--sa-cyan-glow);
-    box-shadow: 0 0 12px var(--sa-cyan-dim);
+    border-color: var(--sa-accent);
+    background: rgba(255, 255, 255, 0.09);
+    box-shadow: 0 0 0 4px var(--sa-accent-soft), inset 0 1px 2px rgba(0, 0, 0, 0.08);
   }
 
-  .sa-input::placeholder,
-  .sa-textarea::placeholder {
-    color: rgba(148, 163, 184, 0.45);
+  .sa-root.light .sa-input:focus,
+  .sa-root.light .sa-select:focus,
+  .sa-root.light .sa-textarea:focus {
+    background: rgba(255, 255, 255, 0.8);
   }
 
-  .sa-select {
-    cursor: pointer;
-    min-height: var(--sa-touch);
+  .sa-error,
+  .sa-success,
+  .sa-empty {
+    margin: 0;
+    padding: 0.62rem 0.75rem;
+    border-radius: 0.8rem;
+    font-size: 0.83rem;
+    line-height: 1.55;
+    text-align: center;
   }
 
   .sa-error {
-    margin: 0;
-    font-size: 0.8rem;
     color: var(--sa-danger);
-    text-align: center;
+    background: var(--sa-danger-soft);
   }
 
   .sa-success {
-    margin: 0;
-    font-size: 0.8rem;
-    color: var(--sa-cyan);
-    text-align: center;
-  }
-
-  .sa-history-list {
-    list-style: none;
-    margin: 0;
-    padding: 0.5rem 0;
-    display: block; /* 改用 Block 佈局確保穩定性 */
-    max-height: 35rem;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .sa-history-item {
-    display: block;
-    margin-bottom: 1.25rem; /* 強制底部間距 */
-    background: rgba(13, 31, 60, 0.65);
-    border: 1px solid var(--sa-border);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  }
-
-  .sa-history-btn {
-    width: 100%;
-    padding: 1.5rem 1.25rem;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    text-align: left;
-    display: block; /* 改用 Block 佈局 */
-    color: inherit;
-    font-family: inherit;
-    min-height: 5.5rem;
-    -webkit-tap-highlight-color: rgba(56, 189, 248, 0.1);
-  }
-
-  .sa-history-btn strong {
-    display: block;
-    color: var(--sa-text-bright);
-    font-size: 1.2rem;
-    font-weight: 700;
-    line-height: 1.4;
-    margin-bottom: 0.5rem;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    word-break: break-word;
-  }
-
-  .sa-history-btn span {
-    display: block;
-    font-size: 0.9rem;
-    font-family: ui-monospace, Consolas, monospace;
-    color: var(--sa-text);
-    line-height: 1.6;
-    opacity: 0.85;
+    color: var(--sa-accent-strong);
+    background: var(--sa-accent-soft);
   }
 
   .sa-empty {
-    margin: 0;
-    text-align: center;
-    font-size: 0.85rem;
-    color: rgba(148, 163, 184, 0.6);
-    padding: 1.25rem 0;
-  }
-
-  .sa-settings-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 0.1rem 0;
+    color: var(--sa-text-muted);
   }
 
   .sa-account {
+    padding: 0.95rem;
+    border-radius: 1.1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.45rem;
-    padding: 0.9rem;
-    background: rgba(13, 31, 60, 0.5);
-    border: 1px solid var(--sa-border);
-    border-radius: 6px;
+    gap: 0.25rem;
   }
 
   .sa-account strong {
-    color: var(--sa-text-bright);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
   }
 
   .sa-account span {
-    font-size: 0.75rem;
-    color: var(--sa-text);
-    word-break: break-word;
+    color: var(--sa-text-muted);
+    font-size: 0.78rem;
+    overflow-wrap: anywhere;
   }
 
   .sa-account span:last-child {
-    color: var(--sa-cyan);
+    color: var(--sa-accent);
   }
 
   .sa-file-input {
@@ -789,192 +765,388 @@ const styles = `
   }
 
   .sa-detail-card {
+    margin: 0;
     padding: 1rem;
-    background: rgba(13, 31, 60, 0.55);
-    border: 1px solid var(--sa-border);
-    border-radius: 6px;
+    border-radius: 1.35rem;
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0.75rem;
   }
 
   .sa-detail-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
+    display: grid;
+    grid-template-columns: minmax(4.5rem, 0.5fr) minmax(0, 1.8fr);
+    gap: 0.75rem;
+    align-items: start;
   }
 
   .sa-detail-row dt {
     margin: 0;
-    font-size: 0.7rem;
-    font-family: ui-monospace, Consolas, monospace;
-    color: var(--sa-cyan);
-    letter-spacing: 0.06em;
+    color: var(--sa-text-muted);
+    font-size: 0.76rem;
+    font-weight: 700;
   }
 
   .sa-detail-row dd {
     margin: 0;
-    font-size: 0.9rem;
-    color: var(--sa-text-bright);
-    word-break: break-word;
+    font-size: 0.91rem;
+    line-height: 1.5;
   }
 
   .sa-detail-link {
-    color: var(--sa-cyan);
+    color: var(--sa-accent);
     text-decoration: none;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
   }
 
   .sa-detail-link:hover {
+    color: var(--sa-accent-strong);
     text-decoration: underline;
   }
 
   .sa-filters {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.56rem;
+  }
+
+  .sa-filters .sa-field:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .sa-history-page {
+    min-height: calc(100dvh - var(--sa-bottom-space) - 1.4rem);
+    height: calc(100dvh - var(--sa-bottom-space) - 1.4rem);
+    gap: 0.75rem;
+  }
+
+  .sa-history-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.15rem 0 0;
+  }
+
+  .sa-history-topbar .sa-btn {
+    width: auto;
+    flex: 0 0 auto;
+  }
+
+  .sa-history-heading {
+    flex: 1;
+    min-width: 0;
+    text-align: right;
+  }
+
+  .sa-history-heading .sa-title {
+    font-size: clamp(1.3rem, 5vw, 1.72rem);
+  }
+
+  .sa-history-heading .sa-subtitle {
+    margin-top: 0.14rem;
+    font-size: 0.76rem;
+  }
+
+  .sa-history-scroll {
+    min-height: 0;
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0.1rem 0.12rem 0.9rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-color: var(--sa-accent-soft) transparent;
+  }
+
+  .sa-history-list {
     display: flex;
     flex-direction: column;
-    gap: 0.55rem;
+    gap: 0.72rem;
+  }
+
+  .sa-history-item {
+    overflow: hidden;
+    border-radius: 1.2rem;
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  .sa-history-item:hover {
+    border-color: var(--sa-border-bright);
+    box-shadow: 0 15px 28px rgba(13, 25, 65, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  }
+
+  .sa-history-btn {
     width: 100%;
+    min-height: 5.3rem;
+    padding: 1rem 1.05rem;
+    border: 0;
+    color: inherit;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+    transition: transform 160ms ease, background-color 160ms ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .sa-history-btn:active {
+    transform: scale(0.985);
+    background: rgba(255, 255, 255, 0.055);
+  }
+
+  .sa-history-btn strong,
+  .sa-history-btn span {
+    display: block;
+  }
+
+  .sa-history-btn strong {
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+    font-weight: 720;
+    line-height: 1.4;
+  }
+
+  .sa-history-btn span {
+    color: var(--sa-text-muted);
+    font-size: 0.81rem;
+    line-height: 1.45;
+  }
+
+  .sa-history-date {
+    margin-top: 0.12rem;
+    font-size: 0.72rem !important;
+    opacity: 0.76;
+  }
+
+  .sa-tab-bar {
+    position: fixed;
+    z-index: 20;
+    left: 50%;
+    bottom: max(0.62rem, env(safe-area-inset-bottom));
+    width: min(calc(100% - 1.2rem), 34rem);
+    min-height: var(--sa-tab-height);
+    padding: 0.36rem;
+    border: 1px solid var(--sa-border-bright);
+    border-radius: 1.55rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.21), rgba(255, 255, 255, 0.035)), rgba(15, 23, 53, 0.48);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.29), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    -webkit-backdrop-filter: blur(24px) saturate(185%);
+    backdrop-filter: blur(24px) saturate(185%);
+  }
+
+  .sa-root.light .sa-tab-bar {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.32));
+  }
+
+  .sa-tab-item {
+    position: relative;
+    min-height: 3.75rem;
+    padding: 0.28rem 0.2rem;
+    border: 0;
+    border-radius: 1.08rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.12rem;
+    color: var(--sa-text-muted);
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  .sa-tab-item.active {
+    color: var(--sa-accent-strong);
+    background: linear-gradient(140deg, rgba(255, 255, 255, 0.22), var(--sa-accent-soft));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 6px 18px var(--sa-accent-soft);
+  }
+
+  .sa-tab-item.active::before {
+    position: absolute;
+    top: 0.42rem;
+    width: 0.32rem;
+    height: 0.32rem;
+    border-radius: 999px;
+    background: var(--sa-accent);
+    box-shadow: 0 0 12px var(--sa-accent-glow);
+    content: '';
+  }
+
+  .sa-tab-icon {
+    font-size: 1.18rem;
+    font-weight: 750;
+    line-height: 1;
+  }
+
+  .sa-tab-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
   }
 
   .sa-modal-overlay {
     position: fixed;
+    z-index: 50;
     inset: 0;
-    z-index: 100;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1.25rem;
-    padding-top: max(1.25rem, env(safe-area-inset-top));
-    padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
-    padding-left: max(1.25rem, env(safe-area-inset-left));
-    padding-right: max(1.25rem, env(safe-area-inset-right));
-    background: var(--sa-modal-bg);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    padding: max(1.25rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right)) max(1.25rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+    background: rgba(4, 9, 26, 0.48);
+    -webkit-backdrop-filter: blur(10px) saturate(130%);
+    backdrop-filter: blur(10px) saturate(130%);
+    animation: sa-fade 180ms ease both;
   }
 
   .sa-modal {
-    width: 100%;
-    max-width: 22rem;
-    padding: 1.25rem;
-    background: linear-gradient(135deg, var(--sa-bg-card) 0%, rgba(13, 31, 60, 0.98) 100%);
-    border: 1px solid var(--sa-border);
-    border-radius: 8px;
-    box-shadow: 0 0 32px rgba(56, 189, 248, 0.15);
+    width: min(100%, 25rem);
+    padding: 1.2rem;
+    border: 1px solid var(--sa-border-bright);
+    border-radius: 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.9rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.19), rgba(255, 255, 255, 0.055)), var(--sa-surface-strong);
+    box-shadow: 0 26px 62px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    -webkit-backdrop-filter: blur(26px) saturate(185%);
+    backdrop-filter: blur(26px) saturate(185%);
+    animation: sa-modal-enter 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   .sa-modal-title {
     margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
     color: var(--sa-text-bright);
+    font-size: 1.08rem;
+    letter-spacing: -0.025em;
     text-align: center;
   }
 
   .sa-modal-text {
     margin: 0;
-    font-size: 0.85rem;
     color: var(--sa-text);
+    font-size: 0.86rem;
     line-height: 1.65;
     text-align: center;
   }
 
   .sa-modal-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.65rem;
   }
 
-  .sa-modal-actions .sa-btn::before {
-    display: none;
+  .sa-footer {
+    margin-top: 0.2rem;
+    color: var(--sa-text-muted);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-align: center;
   }
 
-  @media (min-width: 480px) {
+  @keyframes sa-page-enter {
+    from { opacity: 0; transform: translateY(0.9rem) scale(0.99); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes sa-modal-enter {
+    from { opacity: 0; transform: translateY(0.9rem) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes sa-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes sa-drift {
+    from { transform: translate3d(-1.5rem, -0.8rem, 0) scale(0.92); }
+    to { transform: translate3d(2.2rem, 1.4rem, 0) scale(1.08); }
+  }
+
+  @keyframes sa-orb-float {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+    50% { transform: translate3d(1.8rem, -1.5rem, 0) scale(1.12) rotate(14deg); }
+  }
+
+  @media (min-width: 42rem) {
     .sa-root {
-      padding: 1.5rem;
-      justify-content: center;
+      padding-top: max(1.7rem, env(safe-area-inset-top));
     }
 
     .sa-main {
-      gap: 1.5rem;
+      gap: 1.15rem;
     }
 
-    .sa-auth-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+    .sa-form,
+    .sa-settings-group {
+      padding: 1.15rem;
     }
 
-    .sa-title {
-      font-size: 1.85rem;
+    .sa-history-page {
+      min-height: calc(100dvh - var(--sa-bottom-space) - 2rem);
+      height: calc(100dvh - var(--sa-bottom-space) - 2rem);
     }
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 48rem) {
     .sa-main {
-      max-width: 36rem;
+      width: min(100%, 45rem);
     }
 
     .sa-card-grid {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .sa-filters {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.65rem;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(9rem, 0.72fr);
+    }
+
+    .sa-filters .sa-field:last-child {
+      grid-column: auto;
     }
   }
 
-  /* Light Theme Overrides */
-  .sa-root.light {
-    --sa-bg-deep: #f8fafc;
-    --sa-bg-mid: #f1f5f9;
-    --sa-bg-card: #ffffff;
-    --sa-cyan: #0284c7;
-    --sa-cyan-dim: rgba(2, 132, 199, 0.1);
-    --sa-cyan-glow: rgba(2, 132, 199, 0.3);
-    --sa-text: #475569;
-    --sa-text-bright: #0f172a;
-    --sa-border: rgba(2, 132, 199, 0.15);
-    --sa-danger: #dc2626;
-    --sa-danger-dim: rgba(220, 38, 38, 0.1);
-    --sa-gradient-top: rgba(186, 230, 253, 0.4);
-    --sa-gradient-bottom: rgba(165, 243, 252, 0.2);
-    --sa-scanline-opacity: 0.015;
-    --sa-grid-opacity: 0.2;
-    --sa-modal-bg: rgba(248, 250, 252, 0.85);
+  @media (max-width: 23rem) {
+    .sa-root {
+      padding-inline: 0.68rem;
+    }
+
+    .sa-tab-bar {
+      width: calc(100% - 0.7rem);
+      border-radius: 1.25rem;
+    }
+
+    .sa-tab-label {
+      font-size: 0.62rem;
+    }
+
+    .sa-actions-row,
+    .sa-auth-actions {
+      grid-template-columns: 1fr;
+    }
+
+    .sa-detail-row {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
   }
 
-  .sa-root.light .sa-stat-card,
-  .sa-root.light .sa-meta-row,
-  .sa-root.light .sa-recent-item,
-  .sa-root.light .sa-history-item,
-  .sa-root.light .sa-account,
-  .sa-root.light .sa-detail-card {
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  }
-
-  .sa-root.light .sa-input,
-  .sa-root.light .sa-select,
-  .sa-root.light .sa-textarea {
-    background: #ffffff;
-  }
-
-  .sa-root.light .sa-btn {
-    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  }
-
-  .sa-root.light .sa-btn-danger {
-    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
-  }
-
-  .sa-root.light .sa-btn-ghost {
-    background: transparent;
-    box-shadow: none;
+  @media (prefers-reduced-motion: reduce) {
+    .sa-root *,
+    .sa-root *::before,
+    .sa-root *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 `
 
@@ -1086,19 +1258,25 @@ function Shell({
   onViewChange: (view: View) => void
   theme: Theme
 }) {
-  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(() => 
-    window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(() =>
+    window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
   )
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-color-scheme: dark)')
-    const handler = (e: MediaQueryListEvent) => setSystemTheme(e.matches ? 'dark' : 'light')
+    const handler = (event: MediaQueryListEvent) => setSystemTheme(event.matches ? 'dark' : 'light')
     media.addEventListener('change', handler)
     return () => media.removeEventListener('change', handler)
   }, [])
 
   const resolvedTheme = theme === 'system' ? systemTheme : theme
   const showTabBar = activeView !== 'init' && activeView !== 'detail' && activeView !== 'edit'
+  const tabs: Array<{ view: 'home' | 'add' | 'history' | 'settings'; label: string; icon: string }> = [
+    { view: 'home', label: '首頁', icon: '⌂' },
+    { view: 'add', label: '新增', icon: '＋' },
+    { view: 'history', label: '紀錄', icon: '▤' },
+    { view: 'settings', label: '設定', icon: '⚙' },
+  ]
 
   return (
     <>
@@ -1106,45 +1284,28 @@ function Shell({
       <div className={`sa-root ${resolvedTheme}`}>
         <div className="sa-grid" aria-hidden="true" />
         <div className="sa-scanline" aria-hidden="true" />
-        {children}
-        
+        <div className="sa-liquid-orb sa-orb-one" aria-hidden="true" />
+        <div className="sa-liquid-orb sa-orb-two" aria-hidden="true" />
+        <div className="sa-liquid-orb sa-orb-three" aria-hidden="true" />
+        <div className="sa-page-stage" key={activeView}>{children}</div>
+
         {showTabBar && (
-          <nav className="sa-tab-bar" aria-label="底部導航">
-            <button
-              type="button"
-              className={`sa-tab-item${activeView === 'home' ? ' active' : ''}`}
-              onClick={() => onViewChange('home')}
-            >
-              <span className="sa-tab-icon">⌂</span>
-              <span className="sa-tab-label">首頁</span>
-            </button>
-            <button
-              type="button"
-              className={`sa-tab-item${activeView === 'add' ? ' active' : ''}`}
-              onClick={() => onViewChange('add')}
-            >
-              <span className="sa-tab-icon">＋</span>
-              <span className="sa-tab-label">新增</span>
-            </button>
-            <button
-              type="button"
-              className={`sa-tab-item${activeView === 'history' ? ' active' : ''}`}
-              onClick={() => onViewChange('history')}
-            >
-              <span className="sa-tab-icon">▤</span>
-              <span className="sa-tab-label">紀錄</span>
-            </button>
-            <button
-              type="button"
-              className={`sa-tab-item${activeView === 'settings' ? ' active' : ''}`}
-              onClick={() => onViewChange('settings')}
-            >
-              <span className="sa-tab-icon">⚙</span>
-              <span className="sa-tab-label">設定</span>
-            </button>
+          <nav className="sa-tab-bar" aria-label="主要導覽">
+            {tabs.map((tab) => (
+              <button
+                key={tab.view}
+                type="button"
+                className={`sa-tab-item${activeView === tab.view ? ' active' : ''}`}
+                aria-current={activeView === tab.view ? 'page' : undefined}
+                onClick={() => onViewChange(tab.view)}
+              >
+                <span className="sa-tab-icon" aria-hidden="true">{tab.icon}</span>
+                <span className="sa-tab-label">{tab.label}</span>
+              </button>
+            ))}
           </nav>
         )}
-        
+
         {overlay}
       </div>
     </>
@@ -1886,84 +2047,77 @@ function App() {
   if (activeView === 'history') {
     return renderShell(
       `歷史紀錄 · ${VERSION}`,
-      <main className="sa-main" style={{ height: '90dvh', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-            <button type="button" className="sa-btn sa-btn-sm sa-btn-ghost" style={{ width: 'auto', margin: 0 }} onClick={() => setView('home')}>
-              ← 返回
-            </button>
-            <header className="sa-header" style={{ flex: 1, textAlign: 'right' }}>
-              <h1 className="sa-title" style={{ fontSize: '1.25rem' }}>歷史紀錄</h1>
-              <p className="sa-subtitle" style={{ fontSize: '0.75rem' }}>共 {data.songs.length} 首</p>
-            </header>
-          </div>
-          
-          <div className="sa-divider" aria-hidden="true" />
-          
-          <div className="sa-filters" style={{ flexShrink: 0 }}>
-            <div className="sa-field">
-              <input
-                className="sa-input"
-                type="search"
-                placeholder="搜尋歌名..."
-                value={searchTitle}
-                onChange={(e) => setSearchTitle(e.target.value)}
-              />
-            </div>
-            <div className="sa-field">
-              <input
-                className="sa-input"
-                type="search"
-                placeholder="搜尋歌手..."
-                value={searchArtist}
-                onChange={(e) => setSearchArtist(e.target.value)}
-              />
-            </div>
-            <div className="sa-field">
-              <select
-                className="sa-select"
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value as SortOption)}
-                style={{ minHeight: '2.5rem', padding: '0.5rem' }}
-              >
-                <option value="date-desc">日期（新→舊）</option>
-                <option value="date-asc">日期（舊→新）</option>
-                <option value="day-desc">天數（高→低）</option>
-                <option value="day-asc">天數（低→高）</option>
-              </select>
-            </div>
-          </div>
+      <main className="sa-main sa-history-page">
+        <div className="sa-history-topbar">
+          <button type="button" className="sa-btn sa-btn-sm sa-btn-ghost" onClick={() => setView('home')}>
+            ← 首頁
+          </button>
+          <header className="sa-history-heading">
+            <h1 className="sa-title">歷史紀錄</h1>
+            <p className="sa-subtitle">共 {data.songs.length} 首歌曲</p>
+          </header>
+        </div>
 
-          <div className="sa-divider" aria-hidden="true" />
+        <div className="sa-divider" aria-hidden="true" />
 
-          <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingRight: '4px' }}>
-            {filteredSongs.length === 0 ? (
-              <p className="sa-empty">
-                {data.songs.length === 0 ? '尚無紀錄。' : '找不到歌曲。'}
-              </p>
-            ) : (
-              <ul className="sa-history-list" style={{ display: 'block', padding: 0 }}>
-                {filteredSongs.map((song) => (
-                  <li key={song.id} className="sa-history-item" style={{ marginBottom: '1rem', display: 'block' }}>
-                    <button
-                      type="button"
-                      className="sa-history-btn"
-                      onClick={() => openSongDetail(song.id)}
-                      style={{ padding: '1.25rem 1rem', display: 'block' }}
-                    >
-                      <strong style={{ fontSize: '1.1rem', marginBottom: '0.4rem', display: 'block' }}>{song.title}</strong>
-                      <span style={{ fontSize: '0.85rem', opacity: 0.8, display: 'block' }}>
-                        第 {song.day} 天 · {song.artist}
-                      </span>
-                      <span style={{ fontSize: '0.75rem', opacity: 0.6, display: 'block', marginTop: '0.2rem' }}>
-                        {formatDisplayDate(song.createdAt)}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+        <div className="sa-filters">
+          <div className="sa-field">
+            <input
+              className="sa-input"
+              type="search"
+              placeholder="搜尋歌名..."
+              value={searchTitle}
+              onChange={(e) => setSearchTitle(e.target.value)}
+            />
           </div>
-        </main>,
+          <div className="sa-field">
+            <input
+              className="sa-input"
+              type="search"
+              placeholder="搜尋歌手..."
+              value={searchArtist}
+              onChange={(e) => setSearchArtist(e.target.value)}
+            />
+          </div>
+          <div className="sa-field">
+            <select
+              className="sa-select"
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value as SortOption)}
+              aria-label="排序方式"
+            >
+              <option value="date-desc">日期（新→舊）</option>
+              <option value="date-asc">日期（舊→新）</option>
+              <option value="day-desc">天數（高→低）</option>
+              <option value="day-asc">天數（低→高）</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="sa-history-scroll">
+          {filteredSongs.length === 0 ? (
+            <p className="sa-empty">
+              {data.songs.length === 0 ? '尚無紀錄。' : '找不到符合條件的歌曲。'}
+            </p>
+          ) : (
+            <ul className="sa-history-list">
+              {filteredSongs.map((song) => (
+                <li key={song.id} className="sa-history-item">
+                  <button
+                    type="button"
+                    className="sa-history-btn"
+                    onClick={() => openSongDetail(song.id)}
+                  >
+                    <strong>{song.title}</strong>
+                    <span>第 {song.day} 天 · {song.artist}</span>
+                    <span className="sa-history-date">{formatDisplayDate(song.createdAt)}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </main>,
     )
   }
 
