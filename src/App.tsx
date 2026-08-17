@@ -10,7 +10,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.14.0b'
+const VERSION = '26.14.1b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -1369,7 +1369,10 @@ function App() {
             persistData(cloudData)
             setInitDayInput(String(cloudData.currentDay))
             setSettingsDayInput(String(cloudData.currentDay))
-            setView(cloudData.initialized ? 'home' : 'init')
+            setView((currentView) => {
+              if (currentView !== 'init') return currentView
+              return cloudData.initialized ? 'home' : 'init'
+            })
           })
           .then(() => setSyncStatus('synced'))
           .catch(() => setSyncStatus('error'))
