@@ -10,7 +10,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.14.1b'
+const VERSION = '26.14.2b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -206,8 +206,16 @@ const styles = `
     margin: 0;
   }
 
+  html {
+    overflow-y: auto;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
+    min-height: 100%;
+    overflow-x: hidden;
     background: #07101f;
+    overscroll-behavior-x: none;
   }
 
   .sa-root {
@@ -239,8 +247,10 @@ const styles = `
     min-height: 100dvh;
     min-height: 100svh;
     padding: max(1.05rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) var(--sa-bottom-space) max(1rem, env(safe-area-inset-left));
-    overflow-x: clip;
+    overflow-x: hidden;
     color: var(--sa-text);
+    touch-action: pan-y;
+    overscroll-behavior-x: none;
     background:
       radial-gradient(58rem 35rem at -10% -14%, rgba(69, 164, 255, 0.33), transparent 58%),
       radial-gradient(44rem 33rem at 108% 16%, rgba(201, 108, 255, 0.3), transparent 60%),
@@ -357,6 +367,8 @@ const styles = `
     position: relative;
     z-index: 1;
     width: 100%;
+    min-height: 0;
+    flex: 1 0 auto;
     display: flex;
     justify-content: center;
     animation: sa-page-enter 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -368,7 +380,8 @@ const styles = `
     flex-direction: column;
     gap: 1rem;
     margin: 0 auto;
-    padding: 0.35rem 0 0;
+    flex: 0 1 auto;
+    padding: 0.35rem 0 1rem;
   }
 
   .sa-header {
@@ -581,6 +594,7 @@ const styles = `
     letter-spacing: -0.01em;
     text-align: center;
     transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
+    touch-action: manipulation;
     -webkit-appearance: none;
     appearance: none;
     -webkit-backdrop-filter: blur(18px) saturate(175%);
@@ -817,8 +831,7 @@ const styles = `
   }
 
   .sa-history-page {
-    min-height: calc(100dvh - var(--sa-bottom-space) - 1.4rem);
-    height: calc(100dvh - var(--sa-bottom-space) - 1.4rem);
+    min-height: calc(100svh - env(safe-area-inset-top) - var(--sa-bottom-space) - 1.4rem);
     gap: 0.75rem;
   }
 
@@ -851,13 +864,11 @@ const styles = `
   }
 
   .sa-history-scroll {
+    width: 100%;
     min-height: 0;
-    flex: 1;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    flex: none;
+    overflow: visible;
     padding: 0.1rem 0.12rem 0.9rem;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-color: var(--sa-accent-soft) transparent;
   }
 
   .sa-history-list {
@@ -960,6 +971,7 @@ const styles = `
     cursor: pointer;
     font: inherit;
     transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+    touch-action: manipulation;
   }
 
   .sa-tab-item.active {
@@ -1090,8 +1102,7 @@ const styles = `
     }
 
     .sa-history-page {
-      min-height: calc(100dvh - var(--sa-bottom-space) - 2rem);
-      height: calc(100dvh - var(--sa-bottom-space) - 2rem);
+      min-height: calc(100svh - env(safe-area-inset-top) - var(--sa-bottom-space) - 2rem);
     }
   }
 
