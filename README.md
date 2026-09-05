@@ -46,6 +46,31 @@ npm run build
 
 登入 Google 或 GitHub 帳號後，資料會同步至該帳號專屬的 Cloud Firestore 文件。初始化頁與設定頁都可以登入同步；未登入時仍可只使用本機資料。同一個電子郵件若已先用 Google 登入，請先用 Google 登入後到設定頁連結 GitHub，之後就能直接用 GitHub 登入同一份資料。
 
+## iOS App 開發（Capacitor + Xcode）
+
+本專案已加入 Capacitor iOS 專案，可在 macOS 的 Xcode 中開發與執行。首次在 MacBook 上操作時，請先安裝 Node.js、Xcode 與 Xcode Command Line Tools，再執行：
+
+```bash
+npm install
+npm run cap:sync
+npm run cap:open:ios
+```
+
+`npm run cap:sync` 會先以 Capacitor 相對資源路徑建置 Web App，再把內容同步到 `ios/`。`npm run cap:open:ios` 會開啟 Xcode 專案；在 Xcode 中選擇 `App` target 與你的 MacBook Air M3 或已連接的 iPhone，即可按 Run 執行。若要使用 Google／GitHub OAuth 登入，請在 Firebase Console、Apple Developer／Xcode Signing 與 OAuth provider 設定中加入實際 iOS Bundle ID：`com.songarchive.personal`，並在正式發布前完成原生 OAuth callback 設定。
+
+GitHub Pages 仍使用原本的 Web 建置指令：
+
+```bash
+npm run build
+```
+
+iOS App 的建置指令：
+
+```bash
+npm run build:ios
+npm run cap:sync
+```
+
 ## 版本
 
-目前版本：`26.14.2b`
+目前版本：`26.15.0b`
