@@ -58,6 +58,16 @@ npm run cap:open:ios
 
 `npm run cap:sync` 會先以 Capacitor 相對資源路徑建置 Web App，再把內容同步到 `ios/`。`npm run cap:open:ios` 會開啟 Xcode 專案；在 Xcode 中選擇 `App` target 與你的 MacBook Air M3 或已連接的 iPhone，即可按 Run 執行。若要使用 Google／GitHub OAuth 登入，請在 Firebase Console、Apple Developer／Xcode Signing 與 OAuth provider 設定中加入實際 iOS Bundle ID：`com.songarchive.personal`，並在正式發布前完成原生 OAuth callback 設定。
 
+如果 Xcode 模擬器仍顯示舊版本號，先確認目前程式碼是最新版本，再完整更新內嵌資源：
+
+```bash
+git pull --ff-only origin main
+npm install
+npm run cap:sync
+```
+
+接著在 Xcode 執行 **Product → Clean Build Folder**（按住 `Option` 後開啟 Product 選單），再按 `Command + B`、`Command + R`。若仍是舊畫面，停止 App、從模擬器刪除 SongArchive，再重新執行；畫面中的版本號應該要與目前原始碼一致。
+
 GitHub Pages 仍使用原本的 Web 建置指令：
 
 ```bash
