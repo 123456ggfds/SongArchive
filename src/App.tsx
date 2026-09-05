@@ -10,7 +10,7 @@ import {
   signOutUser,
 } from './firebase'
 
-const VERSION = '26.15.0b'
+const VERSION = '26.15.1b'
 const STORAGE_KEY = 'songArchive_data'
 
 type Song = {
@@ -384,6 +384,55 @@ const styles = `
     padding: 0.35rem 0 1rem;
   }
 
+  .sa-home-page {
+    gap: 1.15rem;
+  }
+
+  .sa-home-header {
+    gap: 0.22rem;
+    padding: 0.2rem 0 0;
+  }
+
+  .sa-home-header .sa-title {
+    font-size: clamp(2rem, 8vw, 2.45rem);
+  }
+
+  .sa-home-stats {
+    gap: 0.65rem;
+  }
+
+  .sa-home-stats .sa-stat-card {
+    min-height: 5.75rem;
+    padding: 0.88rem 0.95rem;
+  }
+
+  .sa-home-recent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.62rem;
+  }
+
+  .sa-home-recent-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .sa-home-recent-list {
+    gap: 0.55rem;
+  }
+
+  .sa-home-empty {
+    margin: 0;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--sa-border);
+    border-radius: 1rem;
+    color: var(--sa-text-muted);
+    background: rgba(255, 255, 255, 0.18);
+    text-align: center;
+  }
+
   .sa-header {
     display: flex;
     flex-direction: column;
@@ -471,6 +520,7 @@ const styles = `
   }
 
   .sa-stat-card {
+    position: relative;
     min-height: 6.25rem;
     padding: 1rem;
     border-radius: 1.35rem;
@@ -952,7 +1002,14 @@ const styles = `
   }
 
   .sa-root.light .sa-tab-bar {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.32));
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.46));
+  }
+
+  .sa-root.light .sa-home-page .sa-stat-card,
+  .sa-root.light .sa-home-page .sa-recent-item {
+    border-color: rgba(255, 255, 255, 0.86);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.48));
+    box-shadow: 0 14px 30px rgba(55, 91, 151, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.94);
   }
 
   .sa-tab-item {
@@ -1085,6 +1142,16 @@ const styles = `
   @keyframes sa-orb-float {
     0%, 100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
     50% { transform: translate3d(1.8rem, -1.5rem, 0) scale(1.12) rotate(14deg); }
+  }
+
+  @media (max-width: 47.99rem) {
+    .sa-root {
+      padding-top: max(2.6rem, calc(env(safe-area-inset-top) + 0.85rem));
+    }
+
+    .sa-tab-bar {
+      bottom: max(0.8rem, calc(env(safe-area-inset-bottom) + 0.4rem));
+    }
   }
 
   @media (min-width: 42rem) {
@@ -2342,13 +2409,13 @@ function App() {
 
   return renderShell(
     `系統運行中 · ${VERSION}`,
-    <main className="sa-main">
-        <header className="sa-header">
+    <main className="sa-main sa-home-page">
+        <header className="sa-header sa-home-header">
           <p className="sa-badge">個人歌曲管理</p>
           <h1 className="sa-title">Song Archive</h1>
           <p className="sa-version">{VERSION}</p>
         </header>
-        <div className="sa-card-grid">
+        <div className="sa-card-grid sa-home-stats">
           <div className="sa-stat-card">
             <p>目前天數</p>
             <span>第 {data.currentDay} 天</span>
@@ -2360,10 +2427,13 @@ function App() {
         </div>
         <>
             <div className="sa-divider" aria-hidden="true" />
-            <div>
-              <p className="sa-section-title">最近新增</p>
+            <div className="sa-home-recent">
+              <div className="sa-home-recent-heading">
+                <p className="sa-section-title">最近新增</p>
+                {recentSongs.length > 0 && <span className="sa-version">{recentSongs.length} 筆</span>}
+              </div>
               {recentSongs.length > 0 ? (
-                <ul className="sa-recent-list" style={{ marginTop: '0.65rem' }}>
+                <ul className="sa-recent-list sa-home-recent-list">
                 {recentSongs.map((song) => (
                   <li key={song.id} className="sa-recent-item">
                     <strong>{song.title}</strong>
@@ -2374,7 +2444,7 @@ function App() {
                 ))}
                 </ul>
               ) : (
-                <p className="sa-empty">尚無新增歌曲</p>
+                <p className="sa-empty sa-home-empty">尚無新增歌曲</p>
               )}
             </div>
         </>
