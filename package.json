@@ -1,7 +1,7 @@
 {
   "name": "songarchive",
   "private": true,
-  "version": "26.16.0b",
+  "version": "26.17.0b",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,6 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor-firebase/authentication": "^8.5.1",
     "@capacitor/core": "^8.5.1",
     "@capacitor/ios": "^8.5.1",
     "firebase": "^12.15.0",

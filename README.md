@@ -56,7 +56,9 @@ npm run cap:sync
 npm run cap:open:ios
 ```
 
-`npm run cap:sync` 會先以 Capacitor 相對資源路徑建置 Web App，再把內容同步到 `ios/`。`npm run cap:open:ios` 會開啟 Xcode 專案；在 Xcode 中選擇 `App` target 與你的 MacBook Air M3 或已連接的 iPhone，即可按 Run 執行。若要使用 Google／GitHub OAuth 登入，請在 Firebase Console、Apple Developer／Xcode Signing 與 OAuth provider 設定中加入實際 iOS Bundle ID：`com.songarchive.personal`，並在正式發布前完成原生 OAuth callback 設定。
+`npm run cap:sync` 會先以 Capacitor 相對資源路徑建置 Web App，再把內容同步到 `ios/`。`npm run cap:open:ios` 會開啟 Xcode 專案；在 Xcode 中選擇 `App` target 與你的 MacBook Air M3 或已連接的 iPhone，即可按 Run 執行。
+
+iOS 版的 Google／GitHub 登入已改用原生 Firebase Authentication，不再依賴 WKWebView 的 `signInWithPopup`。首次設定時，請在 Firebase Console 的 Authentication → Sign-in method 啟用 Google 與 GitHub，並在 Project settings → Your apps 新增 iOS App，Bundle ID 使用 `com.songarchive.personal`，下載 `GoogleService-Info.plist` 後拖入 Xcode 的 `App` target 並勾選 Copy items if needed。接著在 Xcode 的 App → Info → URL Types 加入 `GoogleService-Info.plist` 內的 `REVERSED_CLIENT_ID`，並執行 `npm run cap:sync`。Web 版仍會使用原本的 Firebase popup 登入。
 
 如果 Xcode 模擬器仍顯示舊版本號，先確認目前程式碼是最新版本，再完整更新內嵌資源：
 
@@ -87,4 +89,4 @@ SongArchive 的 Liquid Glass App Icon 已整合至 Xcode 專案：`ios/App/App/A
 
 ## 版本
 
-目前版本：`26.16.0b`
+目前版本：`26.17.0b`

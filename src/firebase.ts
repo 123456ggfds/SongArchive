@@ -1,9 +1,13 @@
+import { Capacitor } from '@capacitor/core'
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication'
 import { initializeApp } from 'firebase/app'
 import {
   GithubAuthProvider,
   GoogleAuthProvider,
   getAuth,
+  linkWithCredential,
   linkWithPopup,
+  signInWithCredential,
   signInWithPopup,
   signOut,
   type User,
@@ -26,16 +30,47 @@ const db = getFirestore(app)
 const googleProvider = new GoogleAuthProvider()
 const githubProvider = new GithubAuthProvider()
 
+const useNativeAuthentication = Capacitor.isNativePlatform()
+
+async function signInWithNativeGoogle() {
+  const result = await FirebaseAuthentication.signInWithGoogle()
+  const credential = result.credential
+  if (!credential?.idToken && !credential?.accessToken) {
+    throw new Error('Google 登入未返回有效憑證')
+  }
+
+  return signInWithCredential(
+    auth,
+    GoogleAuthProvider.credential(credential.idToken, credential.accessToken),
+  )
+}
+
+async function signInWithNativeGithub() {
+  const result = await FirebaseAuthentication.signInWithGithub()
+  const accessToken = result.credential?.accessToken
+  if (!accessToken) throw new Error('GitHub 登入未返回有效憑證')
+  return signInWithCredential(auth, GithubAuthProvider.credential(accessToken))
+}
+
 export function signInWithGoogle() {
-  return signInWithPopup(auth, googleProvider)
+  return useNativeAuthentication
+    ? signInWithNativeGoogle()
+    : signInWithPopup(auth, googleProvider)
 }
 
 export function signInWithGithub() {
-  return signInWithPopup(auth, githubProvider)
+  return useNativeAuthentication
+    ? signInWithNativeGithub()
+    : signInWithPopup(auth, githubProvider)
 }
 
-export function linkGithubAccount(user: User) {
-  return linkWithPopup(user, githubProvider)
+export async function linkGithubAccount(user: User) {
+  if (!useNativeAuthentication) return linkWithPopup(user, githubProvider)
+
+  const result = await FirebaseAuthentication.signInWithGithub()
+  const accessToken = result.credential?.accessToken
+  if (!accessToken) throw new Error('GitHub 登入未返回有效憑證')
+  return linkWithCredential(user, GithubAuthProvider.credential(accessToken))
 }
 
 export function signOutUser() {
