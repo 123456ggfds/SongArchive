@@ -81,6 +81,10 @@ npm run build:ios
 npm run cap:sync
 ```
 
+## App Icon
+
+SongArchive 的 Liquid Glass App Icon 已整合至 Xcode 專案：`ios/App/App/Assets.xcassets/AppIcon.appiconset/`。若 Xcode 沒有立即顯示新圖示，請執行 `Product → Clean Build Folder`，再重新安裝模擬器或實體 iPhone 上的 App。
+
 ## 版本
 
-目前版本：`26.15.1b`
+目前版本：`26.16.0b`
