@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Capacitor } from '@capacitor/core'
 import { onAuthStateChanged, type User } from 'firebase/auth'
 import {
   auth,
@@ -165,13 +166,92 @@ function formatDisplayDate(iso: string): string {
   })
 }
 
-function downloadBackup(data: ArchiveData) {
+const TRAILING_URL_PUNCTUATION = /[.,!?;:，。！？；：、】【）〕〉》]+$/
+
+function normalizeExternalUrl(value: string): string | null {
+  const trimmed = value.trim().replace(TRAILING_URL_PUNCTUATION, '')
+  if (!trimmed) return null
+
+  const withProtocol = /^www\./i.test(trimmed) ? `https://${trimmed}` : trimmed
+  try {
+    const url = new URL(withProtocol)
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : null
+  } catch {
+    return null
+  }
+}
+
+type YouTubeSongMetadata = {
+  title: string
+  artist: string
+}
+
+function getYouTubeOEmbedUrl(value: string): string | null {
+  const normalized = normalizeExternalUrl(value)
+  if (!normalized) return null
+
+  const url = new URL(normalized)
+  const host = url.hostname.toLowerCase().replace(/^www\./, '')
+  let videoId: string | null = null
+
+  if (host === 'music.youtube.com' || host === 'youtube.com' || host === 'm.youtube.com') {
+    videoId = url.pathname === '/watch' ? url.searchParams.get('v') : null
+  } else if (host === 'youtu.be') {
+    videoId = url.pathname.slice(1)
+  }
+
+  if (!videoId) return null
+  return `https://www.youtube.com/oembed?url=${encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`)}&format=json`
+}
+
+function cleanYouTubeTitle(value: string): string {
+  return value
+    .replace(/\s*(?:\(|\[)(?:official\s+)?(?:music\s+)?(?:video|audio|visualizer|lyric\s+video)[^\])]*(?:\)|\])/gi, '')
+    .trim()
+}
+
+function cleanYouTubeArtist(value: string): string {
+  return value.replace(/\s*-\s*Topic$/i, '').trim()
+}
+
+async function getYouTubeSongMetadata(oembedUrl: string): Promise<YouTubeSongMetadata> {
+  const response = await fetch(oembedUrl)
+  if (!response.ok) throw new Error('YouTube metadata request failed')
+
+  const payload: unknown = await response.json()
+  if (typeof payload !== 'object' || payload === null) throw new Error('Invalid YouTube metadata')
+  const record = payload as Record<string, unknown>
+  if (typeof record.title !== 'string' || typeof record.author_name !== 'string') {
+    throw new Error('Incomplete YouTube metadata')
+  }
+
+  return {
+    title: cleanYouTubeTitle(record.title),
+    artist: cleanYouTubeArtist(record.author_name),
+  }
+}
+
+async function downloadBackup(data: ArchiveData) {
   const json = JSON.stringify(data, null, 2)
+  const filename = `SongArchive_Backup_${formatBackupDate(new Date())}.json`
+  if (Capacitor.getPlatform() === 'android') {
+    const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem')
+    const { Share } = await import('@capacitor/share')
+    const file = await Filesystem.writeFile({
+      path: `backups/${filename}`,
+      data: json,
+      directory: Directory.Cache,
+      encoding: Encoding.UTF8,
+      recursive: true,
+    })
+    await Share.share({ title: 'SongArchive 備份', files: [file.uri] })
+    return
+  }
   const blob = new Blob([json], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
   anchor.href = url
-  anchor.download = `SongArchive_Backup_${formatBackupDate(new Date())}.json`
+  anchor.download = filename
   anchor.click()
   URL.revokeObjectURL(url)
 }
@@ -1407,6 +1487,8 @@ function App() {
   const [songLink, setSongLink] = useState('')
   const [songNote, setSongNote] = useState('')
   const [formError, setFormError] = useState('')
+  const [youtubeLookupStatus, setYoutubeLookupStatus] = useState('')
+  const lookedUpYoutubeUrlRef = useRef('')
 
   const [searchTitle, setSearchTitle] = useState('')
   const [searchArtist, setSearchArtist] = useState('')
@@ -1420,6 +1502,37 @@ function App() {
   const [syncStatus, setSyncStatus] = useState<'local' | 'syncing' | 'synced' | 'error'>('local')
   const [confirmAction, setConfirmAction] = useState<ConfirmAction | null>(null)
   const importInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const oembedUrl = getYouTubeOEmbedUrl(songLink)
+    if (!oembedUrl) {
+      lookedUpYoutubeUrlRef.current = ''
+      queueMicrotask(() => setYoutubeLookupStatus(''))
+      return
+    }
+    if (lookedUpYoutubeUrlRef.current === oembedUrl) return
+
+    lookedUpYoutubeUrlRef.current = oembedUrl
+    let cancelled = false
+    queueMicrotask(() => {
+      if (!cancelled) setYoutubeLookupStatus('正在辨識 YouTube Music 資訊…')
+    })
+
+    void getYouTubeSongMetadata(oembedUrl)
+      .then((metadata) => {
+        if (cancelled) return
+        setSongTitle((current) => current || metadata.title)
+        setSongArtist((current) => current || metadata.artist)
+        setYoutubeLookupStatus('已自動帶入 YouTube Music 資訊')
+      })
+      .catch(() => {
+        if (!cancelled) setYoutubeLookupStatus('無法辨識此 YouTube Music 連結，請手動輸入資訊')
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [songLink])
 
   useEffect(
     () =>
@@ -1527,6 +1640,8 @@ function App() {
     setSongLink('')
     setSongNote('')
     setFormError('')
+    setYoutubeLookupStatus('')
+    lookedUpYoutubeUrlRef.current = ''
   }
 
 
@@ -1538,6 +1653,8 @@ function App() {
     setSongLink(song.link ?? '')
     setSongNote(song.note ?? '')
     setFormError('')
+    setYoutubeLookupStatus('')
+    lookedUpYoutubeUrlRef.current = getYouTubeOEmbedUrl(song.link ?? '') ?? ''
     setView('edit')
   }
 
@@ -1575,6 +1692,10 @@ function App() {
       setFormError('請輸入歌手')
       return false
     }
+    if (songLink.trim() && !normalizeExternalUrl(songLink)) {
+      setFormError('請輸入有效的網址（例如 https://example.com 或 www.example.com）')
+      return false
+    }
     return true
   }
 
@@ -1590,7 +1711,8 @@ function App() {
       createdAt: now,
     }
 
-    if (songLink.trim()) song.link = songLink.trim()
+    const normalizedLink = normalizeExternalUrl(songLink)
+    if (normalizedLink) song.link = normalizedLink
     if (songNote.trim()) song.note = songNote.trim()
 
     const nextDay = data.currentDay + 1
@@ -1616,8 +1738,9 @@ function App() {
         artist: songArtist.trim(),
         updatedAt: now,
       }
-      if (songLink.trim()) {
-        updated.link = songLink.trim()
+      const normalizedLink = normalizeExternalUrl(songLink)
+      if (normalizedLink) {
+        updated.link = normalizedLink
       } else {
         delete updated.link
       }
@@ -1806,10 +1929,15 @@ function App() {
     setConfirmAction(null)
   }
 
-  const handleExport = () => {
-    downloadBackup(data)
+  const handleExport = async () => {
     setSettingsError('')
-    setSettingsMessage('資料已匯出')
+    setSettingsMessage('')
+    try {
+      await downloadBackup(data)
+      setSettingsMessage(Capacitor.getPlatform() === 'android' ? '備份已交由分享功能處理，請確認已儲存' : '資料已匯出')
+    } catch {
+      setSettingsError('匯出未完成，請重試並選擇儲存或分享位置')
+    }
   }
 
   const handleImportClick = () => {
@@ -1910,17 +2038,25 @@ function App() {
       </div>
       <div className="sa-field">
         <label className="sa-label" htmlFor="song-link">
-          連結（選填）
+          連結（選填，支援 YouTube Music 自動辨識）
         </label>
         <input
           id="song-link"
           className="sa-input"
-          type="url"
+          type="text"
           inputMode="url"
-          placeholder="https://"
+          placeholder="https:// 或 www.example.com"
           value={songLink}
-          onChange={(e) => setSongLink(e.target.value)}
+          onChange={(e) => {
+            setSongLink(e.target.value)
+            setFormError('')
+          }}
+          onBlur={() => {
+            const normalizedLink = normalizeExternalUrl(songLink)
+            if (normalizedLink) setSongLink(normalizedLink)
+          }}
         />
+        {youtubeLookupStatus && <p className="sa-subtitle">{youtubeLookupStatus}</p>}
       </div>
       <div className="sa-field">
         <label className="sa-label" htmlFor="song-note">
@@ -2084,13 +2220,13 @@ function App() {
                 <dd>{formatDisplayDate(selectedSong.updatedAt)}</dd>
               </div>
             )}
-            {selectedSong.link && (
+            {selectedSong.link && normalizeExternalUrl(selectedSong.link) && (
               <div className="sa-detail-row">
                 <dt>連結</dt>
                 <dd>
                   <a
                     className="sa-detail-link"
-                    href={selectedSong.link}
+                    href={normalizeExternalUrl(selectedSong.link) ?? undefined}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

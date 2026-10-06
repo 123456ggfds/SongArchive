@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:ios": "cross-env CAPACITOR_BUILD=true npm run build",
+    "build:android": "cross-env CAPACITOR_BUILD=true npm run build",
+    "cap:sync:android": "npm run build:android && npx cap sync android",
+    "cap:open:android": "npx cap open android",
     "cap:sync": "npm run build:ios && npx cap sync ios",
     "cap:open:ios": "npx cap open ios",
     "lint": "eslint .",
@@ -14,8 +17,11 @@
   },
   "dependencies": {
     "@capacitor-firebase/authentication": "^8.5.1",
+    "@capacitor/android": "^8.5.2",
     "@capacitor/core": "^8.5.1",
+    "@capacitor/filesystem": "^8.1.3",
     "@capacitor/ios": "^8.5.1",
+    "@capacitor/share": "^8.0.2",
     "firebase": "^12.15.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"

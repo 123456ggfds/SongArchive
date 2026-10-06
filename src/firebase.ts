@@ -73,8 +73,13 @@ export async function linkGithubAccount(user: User) {
   return linkWithCredential(user, GithubAuthProvider.credential(accessToken))
 }
 
-export function signOutUser() {
-  return signOut(auth)
+export async function signOutUser() {
+  // Android OAuth providers also create a native Firebase session.
+  try {
+    if (Capacitor.getPlatform() === 'android') await FirebaseAuthentication.signOut()
+  } finally {
+    await signOut(auth)
+  }
 }
 
 export async function loadCloudArchive(user: User): Promise<unknown | null> {
