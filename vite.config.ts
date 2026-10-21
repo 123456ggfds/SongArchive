@@ -5,6 +5,10 @@ const isCapacitorBuild = process.env.CAPACITOR_BUILD === 'true'
 
 // Keep GitHub Pages absolute base while using relative assets inside native WebViews.
 export default defineConfig({
-  base: isCapacitorBuild ? './' : '/SongArchive/',
+  base: isCapacitorBuild
+  ? './'
+  : process.env.VERCEL
+    ? '/'
+    : '/SongArchive/',
   plugins: [react()],
 })
